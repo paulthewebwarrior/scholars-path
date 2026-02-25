@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import get_settings
 from .database import Base, engine
 from .routers.auth import router as auth_router
+from .routers.habits import router as habits_router
 from .routers.profile import router as profile_router
 
 settings = get_settings()
@@ -31,3 +32,4 @@ def health() -> dict[str, str]:
 
 app.include_router(auth_router)
 app.include_router(profile_router)
+app.include_router(habits_router)

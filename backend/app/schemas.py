@@ -99,3 +99,121 @@ class UserProfileResponse(BaseModel):
     career_goal: str
     created_at: datetime
     updated_at: datetime
+
+
+class HabitsAssessmentBase(BaseModel):
+    study_hours: float
+    sleep_hours: float
+    phone_usage_hours: float
+    social_media_hours: float
+    gaming_hours: float
+    breaks_per_day: float
+    coffee_intake: float
+    exercise_minutes: float
+    stress_level: float
+    focus_score: float
+    attendance_percentage: float
+    assignments_completed_per_week: float
+    final_grade: float | None = None
+    grade_opt_in: bool = False
+
+    @field_validator(
+        'study_hours',
+        'sleep_hours',
+        'phone_usage_hours',
+        'social_media_hours',
+        'gaming_hours',
+        'breaks_per_day',
+        'coffee_intake',
+        'exercise_minutes',
+        'assignments_completed_per_week',
+    )
+    @classmethod
+    def validate_non_negative(cls, value: float) -> float:
+        if value < 0:
+            raise ValueError('Value cannot be negative')
+        return value
+
+    @field_validator('stress_level')
+    @classmethod
+    def validate_stress_level(cls, value: float) -> float:
+        if value < 1 or value > 10:
+            raise ValueError('Stress level must be between 1 and 10')
+        return value
+
+    @field_validator('focus_score')
+    @classmethod
+    def validate_focus_score(cls, value: float) -> float:
+        if value < 0 or value > 100:
+            raise ValueError('Focus score must be between 0 and 100')
+        return value
+
+    @field_validator('attendance_percentage')
+    @classmethod
+    def validate_attendance_percentage(cls, value: float) -> float:
+        if value < 0 or value > 100:
+            raise ValueError('Attendance percentage must be between 0 and 100')
+        return value
+
+    @field_validator('final_grade')
+    @classmethod
+    def validate_final_grade(cls, value: float | None) -> float | None:
+        if value is None:
+            return value
+        if value < 0 or value > 100:
+            raise ValueError('Final grade must be between 0 and 100')
+        return value
+
+
+class HabitsAssessmentCreate(HabitsAssessmentBase):
+    pass
+
+
+class HabitsAssessmentResponse(HabitsAssessmentBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    assessment_id: int
+    user_id: int
+    created_at: datetime
+    updated_at: datetime
+
+
+class HabitsAssessmentHistoryResponse(BaseModel):
+    items: list[HabitsAssessmentResponse]
+    page: int
+    page_size: int
+    total: int
+
+
+class HabitsCorrelationResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    metric_name: str
+    performance_metric: str
+    correlation_coefficient: float
+    sample_size: int
+    confidence_interval_low: float
+    confidence_interval_high: float
+    confidence_level: float
+    p_value: float
+    calculation_timestamp: datetime
+
+
+class HabitsRecommendationResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    assessment_id: int
+    user_id: int
+    recommendation_text: str
+    priority_rank: int
+    supporting_metric: str
+    correlation_strength: float
+    status: Literal['pending', 'attempted', 'completed', 'not_applicable']
+    status_updated_at: datetime | None
+    created_at: datetime
+
+
+class HabitsRecommendationsListResponse(BaseModel):
+    items: list[HabitsRecommendationResponse]
