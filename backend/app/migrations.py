@@ -17,3 +17,6 @@ def ensure_career_schema(engine: Engine) -> None:
                 'CREATE INDEX IF NOT EXISTS ix_users_career_id ON users (career_id)'
             )
         )
+
+        if 'career_goal' in user_columns:
+            connection.execute(text('ALTER TABLE users DROP COLUMN career_goal'))

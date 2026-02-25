@@ -6,7 +6,6 @@ REGISTRATION_PAYLOAD = {
     'name': 'Profile User',
     'course': 'Information Technology',
     'year_level': 'Senior',
-    'career_goal': 'Product Manager',
 }
 
 
@@ -46,7 +45,6 @@ def test_get_and_update_profile(client: TestClient) -> None:
         'name': 'Updated Name',
         'course': 'Computer Science',
         'year_level': 'Junior',
-        'career_goal': 'Engineering Manager',
     }
     updated = client.put('/api/profile/me', json=update_payload, headers=headers)
     assert updated.status_code == 200
@@ -55,7 +53,7 @@ def test_get_and_update_profile(client: TestClient) -> None:
 
     persisted = client.get('/api/profile/me', headers=headers)
     assert persisted.status_code == 200
-    assert persisted.json()['career_goal'] == 'Engineering Manager'
+    assert persisted.json()['name'] == 'Updated Name'
 
 
 def test_set_and_update_career(client: TestClient) -> None:

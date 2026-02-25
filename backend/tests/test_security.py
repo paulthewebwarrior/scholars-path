@@ -10,7 +10,6 @@ def _dummy_user() -> User:
         name='Alice',
         course='Computer Science',
         year_level='Senior',
-        career_goal='Backend Engineer',
     )
 
 

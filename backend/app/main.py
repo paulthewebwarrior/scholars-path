@@ -106,7 +106,6 @@ def on_startup() -> None:
 def health() -> dict[str, str]:
     return {'status': 'ok'}
 
-
 app.include_router(auth_router)
 app.include_router(profile_router)
 app.include_router(careers_router)

@@ -16,7 +16,6 @@ class RegisterRequest(BaseModel):
     name: str
     course: str
     year_level: Literal['Freshman', 'Sophomore', 'Junior', 'Senior']
-    career_goal: str = ''
 
     @field_validator('password')
     @classmethod
@@ -38,11 +37,6 @@ class RegisterRequest(BaseModel):
         if not cleaned:
             raise ValueError('All fields are required')
         return cleaned
-
-    @field_validator('career_goal')
-    @classmethod
-    def normalize_career_goal(cls, value: str) -> str:
-        return value.strip()
 
 
 class LoginRequest(BaseModel):
@@ -67,7 +61,6 @@ class ProfileUpdateRequest(BaseModel):
     name: str
     course: str
     year_level: Literal['Freshman', 'Sophomore', 'Junior', 'Senior']
-    career_goal: str
 
     @field_validator('name')
     @classmethod
@@ -87,11 +80,6 @@ class ProfileUpdateRequest(BaseModel):
             raise ValueError('All fields are required')
         return cleaned
 
-    @field_validator('career_goal')
-    @classmethod
-    def clean_career_goal(cls, value: str) -> str:
-        return value.strip()
-
 
 class CareerSummaryResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -110,7 +98,6 @@ class UserProfileResponse(BaseModel):
     course: str
     year_level: str
     career_id: int | None = None
-    career_goal: str
     career: CareerSummaryResponse | None = None
     created_at: datetime
     updated_at: datetime

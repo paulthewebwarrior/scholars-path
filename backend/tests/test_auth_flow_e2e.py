@@ -8,7 +8,6 @@ def test_full_registration_login_profile_refresh_flow(client: TestClient) -> Non
         'name': 'End To End',
         'course': 'Data Science',
         'year_level': 'Sophomore',
-        'career_goal': 'Data Engineer',
     }
 
     register = client.post('/api/auth/register', json=register_payload)
@@ -32,7 +31,6 @@ def test_full_registration_login_profile_refresh_flow(client: TestClient) -> Non
             'name': 'End To End Updated',
             'course': 'Data Science',
             'year_level': 'Junior',
-            'career_goal': 'Machine Learning Engineer',
         },
     )
     assert update.status_code == 200
@@ -54,7 +52,6 @@ def test_refresh_allows_recovery_after_access_token_failure(client: TestClient) 
         'name': 'Recovery User',
         'course': 'Computer Science',
         'year_level': 'Senior',
-        'career_goal': 'Platform Engineer',
     }
 
     register = client.post('/api/auth/register', json=register_payload)

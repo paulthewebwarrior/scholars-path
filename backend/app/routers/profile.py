@@ -30,7 +30,6 @@ def _profile_response_from_user(db: Session, user: User) -> UserProfileResponse:
         course=user.course,
         year_level=user.year_level,
         career_id=user.career_id,
-        career_goal=user.career_goal,
         career=career_response,
         created_at=user.created_at,
         updated_at=user.updated_at,
@@ -54,7 +53,6 @@ def update_profile(
     current_user.name = payload.name
     current_user.course = payload.course
     current_user.year_level = payload.year_level
-    current_user.career_goal = payload.career_goal
 
     try:
         db.commit()
@@ -80,7 +78,6 @@ def set_career(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Career not found')
 
     current_user.career_id = career.id
-    current_user.career_goal = career.name
 
     try:
         db.commit()
@@ -106,7 +103,6 @@ def update_career(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Career not found')
 
     current_user.career_id = career.id
-    current_user.career_goal = career.name
 
     try:
         db.commit()

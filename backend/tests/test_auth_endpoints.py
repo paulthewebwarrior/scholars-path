@@ -6,7 +6,6 @@ VALID_REGISTRATION = {
     'name': 'Student Name',
     'course': 'Computer Science',
     'year_level': 'Junior',
-    'career_goal': 'Software Engineer',
 }
 
 

@@ -47,7 +47,6 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> Registe
         name=payload.name,
         course=payload.course,
         year_level=payload.year_level,
-        career_goal=payload.career_goal,
     )
     db.add(user)
 

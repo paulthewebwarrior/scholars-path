@@ -20,7 +20,6 @@ TEST_USERS = [
         'name': 'Alex Johnson',
         'course': 'Computer Science',
         'year_level': 'Junior',
-        'career_goal': 'Software Engineer',
     },
     {
         'email': 'student2@example.com',
@@ -28,7 +27,6 @@ TEST_USERS = [
         'name': 'Sam Rivera',
         'course': 'Information Systems',
         'year_level': 'Sophomore',
-        'career_goal': 'Data Analyst',
     },
 ]
 
@@ -48,7 +46,6 @@ def main() -> None:
                 name=payload['name'],
                 course=payload['course'],
                 year_level=payload['year_level'],
-                career_goal=payload['career_goal'],
             )
             db.add(user)
             created += 1
