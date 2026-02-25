@@ -1,0 +1,18 @@
+<section class="page-shell">
+  <h1>Dashboard</h1>
+  <p class="subtitle">Welcome back, {{ auth.user()?.name }}.</p>
+
+  <div class="panel-grid">
+    <article class="panel">
+      <h2>Account</h2>
+      <p>Course: {{ auth.user()?.course }}</p>
+      <p>Year Level: {{ auth.user()?.year_level }}</p>
+      <a routerLink="/profile">Manage profile</a>
+    </article>
+
+    <article class="panel">
+      <h2>Next Step</h2>
+      <p>Continue with study-habit assessment to generate personalized recommendations.</p>
+    </article>
+  </div>
+</section>

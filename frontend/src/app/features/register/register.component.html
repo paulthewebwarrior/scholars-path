@@ -1,0 +1,47 @@
+<section class="auth-card">
+  <h1>Create account</h1>
+
+  <form [formGroup]="registerForm" (ngSubmit)="submit()">
+    <label for="email">Email</label>
+    <input id="email" type="email" formControlName="email" autocomplete="email" />
+    @if (registerForm.controls.email.dirty && registerForm.controls.email.errors?.['email']) {
+      <p class="field-feedback">Invalid email format</p>
+    }
+
+    <label for="password">Password</label>
+    <input id="password" type="password" formControlName="password" autocomplete="new-password" />
+    <p class="field-feedback">Strength: {{ passwordStrength().label }}</p>
+    <ul class="password-checklist">
+      <li [class.pass]="passwordStrength().checks.length">At least 8 characters</li>
+      <li [class.pass]="passwordStrength().checks.uppercase">One uppercase letter</li>
+      <li [class.pass]="passwordStrength().checks.lowercase">One lowercase letter</li>
+      <li [class.pass]="passwordStrength().checks.number">One number</li>
+    </ul>
+
+    <label for="name">Full name</label>
+    <input id="name" type="text" formControlName="name" autocomplete="name" />
+
+    <label for="course">Course</label>
+    <input id="course" type="text" formControlName="course" />
+
+    <label for="year-level">Year level</label>
+    <select id="year-level" formControlName="year_level">
+      @for (year of yearLevels; track year) {
+        <option [value]="year">{{ year }}</option>
+      }
+    </select>
+
+    <label for="career-goal">Career goal</label>
+    <input id="career-goal" type="text" formControlName="career_goal" />
+
+    @if (serverError()) {
+      <p class="error-message">{{ serverError() }}</p>
+    }
+
+    <button type="submit" [disabled]="registerForm.invalid || loading()">
+      {{ loading() ? 'Creating account...' : 'Register' }}
+    </button>
+  </form>
+
+  <p class="meta-link">Already have an account? <a routerLink="/login">Sign in</a>.</p>
+</section>

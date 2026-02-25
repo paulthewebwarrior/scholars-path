@@ -1,0 +1,31 @@
+.page-shell {
+  display: grid;
+  gap: 1rem;
+}
+
+.subtitle {
+  color: var(--muted-text);
+  margin: 0;
+}
+
+.panel-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.panel {
+  border: 1px solid var(--surface-border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background: var(--surface-muted);
+}
+
+.panel h2 {
+  margin-top: 0;
+}
+
+.panel a {
+  color: var(--accent);
+  text-decoration: none;
+}

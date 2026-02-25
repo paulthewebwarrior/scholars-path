@@ -1,0 +1,61 @@
+<section class="profile-shell">
+  <header class="profile-header">
+    <div>
+      <h1>My Profile</h1>
+      <p>Manage your personal details for personalized recommendations.</p>
+    </div>
+
+    <div class="actions">
+      @if (!editing()) {
+        <button type="button" class="secondary" (click)="startEdit()">Edit profile</button>
+      } @else {
+        <button type="button" class="secondary" (click)="cancelEdit()">Cancel</button>
+      }
+      <button type="button" class="danger" (click)="logout()">Logout</button>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <p>Loading profile...</p>
+  } @else {
+    @if (successMessage()) {
+      <p class="success-message">{{ successMessage() }}</p>
+    }
+
+    @if (errorMessage()) {
+      <p class="error-message">{{ errorMessage() }}</p>
+    }
+
+    @if (!editing()) {
+      <dl class="profile-list">
+        <div><dt>Name</dt><dd>{{ auth.user()?.name }}</dd></div>
+        <div><dt>Email</dt><dd>{{ auth.user()?.email }}</dd></div>
+        <div><dt>Course</dt><dd>{{ auth.user()?.course }}</dd></div>
+        <div><dt>Year Level</dt><dd>{{ auth.user()?.year_level }}</dd></div>
+        <div><dt>Career Goal</dt><dd>{{ auth.user()?.career_goal || 'Not set' }}</dd></div>
+      </dl>
+    } @else {
+      <form [formGroup]="profileForm" (ngSubmit)="save()" class="profile-form">
+        <label for="name">Name</label>
+        <input id="name" type="text" formControlName="name" />
+
+        <label for="course">Course</label>
+        <input id="course" type="text" formControlName="course" />
+
+        <label for="year-level">Year level</label>
+        <select id="year-level" formControlName="year_level">
+          @for (year of yearLevels; track year) {
+            <option [value]="year">{{ year }}</option>
+          }
+        </select>
+
+        <label for="career-goal">Career goal</label>
+        <textarea id="career-goal" formControlName="career_goal" rows="3"></textarea>
+
+        <button type="submit" [disabled]="profileForm.invalid || saving()">
+          {{ saving() ? 'Saving...' : 'Save changes' }}
+        </button>
+      </form>
+    }
+  }
+</section>
