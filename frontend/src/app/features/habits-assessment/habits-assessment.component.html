@@ -1,0 +1,289 @@
+<section class="px-page assessment-page" [class.leaving]="leaving()">
+
+  <!-- ── Header ── -->
+  <header class="assessment-header">
+    <div>
+      <h1 class="px-page-title">
+        <i class="fa-solid fa-clipboard-list"></i>
+        Study Habits Assessment
+      </h1>
+      <p class="px-page-subtitle">
+        Complete your 13-metric habit questionnaire to unlock personalized recommendations.
+      </p>
+    </div>
+    <div class="draft-badge" [class.draft-badge--clean]="!hasUnsavedChanges()">
+      <i class="fa-solid fa-floppy-disk"></i>
+      <span>{{ draftStatus() }}</span>
+    </div>
+  </header>
+
+  <!-- ── Pixel progress bar ── -->
+  <div class="progress-track" role="progressbar" [attr.aria-valuenow]="completionPercentage" aria-valuemin="0" aria-valuemax="100" aria-label="Assessment completion" title="Assessment completion">
+    <div class="progress-segs">
+      @for (i of progressSegments; track i) {
+        <div class="progress-seg" [class.progress-seg--filled]="i < progressCount"></div>
+      }
+    </div>
+    <span class="progress-label">mission progress&nbsp;{{ completionPercentage }}%</span>
+  </div>
+
+  <!-- ── Step Indicator ── -->
+  <div class="step-indicator">
+    <div class="step-dots">
+      @for (dot of stepDots; track dot) {
+        <div class="step-dot"
+             [class.step-dot--done]="dot + 1 < currentStep()"
+             [class.step-dot--active]="dot + 1 === currentStep()"
+             [attr.aria-label]="'Step ' + (dot + 1)"></div>
+      }
+    </div>
+    <span class="step-label">Step {{ currentStep() }} of {{ TOTAL_STEPS }} &mdash; {{ STEP_LABELS[currentStep()] }}</span>
+  </div>
+
+  <!-- ── Feedback ── -->
+  @if (successMessage()) {
+    <p class="px-msg px-msg--success"><i class="fa-solid fa-circle-check"></i> {{ successMessage() }}</p>
+  }
+  @if (errorMessage()) {
+    <p class="px-msg px-msg--error"><i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage() }}</p>
+  }
+
+  <form class="habits-form" [formGroup]="habitsForm" (ngSubmit)="submit()" aria-label="Habits Assessment Form">
+
+    <!-- ── Section 1: Study Patterns ── -->
+    @if (currentStep() === 1) {
+    <article class="px-panel section-panel section-delay-0">
+      <h2 class="px-panel__title"><i class="fa-solid fa-book-open"></i> Study Patterns</h2>
+      <div class="field-grid">
+
+        <div class="field-block">
+          <label class="field-label" for="study-hours">
+            <i class="fa-solid fa-clock"></i> Study hours / day
+          </label>
+          <div class="num-row">
+            <input id="study-hours" type="number" formControlName="study_hours"
+                   min="0" max="24" step="0.5" class="px-input" />
+            <span class="input-unit">hrs</span>
+          </div>
+          <small class="field-error">{{ fieldError('study_hours') }}</small>
+        </div>
+
+        <div class="field-block">
+          <label class="field-label" for="breaks-day">
+            <i class="fa-solid fa-mug-saucer"></i> Breaks / day
+          </label>
+          <div class="num-row">
+            <input id="breaks-day" type="number" formControlName="breaks_per_day"
+                   min="0" max="50" step="1" class="px-input" />
+            <span class="input-unit">×</span>
+          </div>
+          <small class="field-error">{{ fieldError('breaks_per_day') }}</small>
+        </div>
+
+        <div class="field-block">
+          <label class="field-label" for="assignments-week">
+            <i class="fa-solid fa-clipboard-check"></i> Assignments / week
+          </label>
+          <div class="num-row">
+            <input id="assignments-week" type="number" formControlName="assignments_completed_per_week"
+                   min="0" max="50" step="1" class="px-input" />
+            <span class="input-unit">tasks</span>
+          </div>
+          <small class="field-error">{{ fieldError('assignments_completed_per_week') }}</small>
+        </div>
+
+        <div class="field-block field-block--full">
+          <label class="field-label" for="focus-score">
+            <i class="fa-solid fa-bullseye"></i> Focus score
+            <span class="range-badge">{{ rangeValue('focus_score') }}</span>
+          </label>
+          <input id="focus-score" type="range" formControlName="focus_score"
+                 min="0" max="100" step="1" class="px-slider" />
+          <div class="range-labels"><span>0 — distracted</span><span>50</span><span>100 — laser focus</span></div>
+          <small class="field-error">{{ fieldError('focus_score') }}</small>
+        </div>
+
+      </div>
+    </article>
+    }
+
+    <!-- ── Section 2: Lifestyle ── -->
+    @if (currentStep() === 2) {
+    <article class="px-panel section-panel section-delay-0">
+      <h2 class="px-panel__title"><i class="fa-solid fa-heart-pulse"></i> Lifestyle</h2>
+      <div class="field-grid">
+
+        <div class="field-block">
+          <label class="field-label" for="sleep-hours">
+            <i class="fa-solid fa-moon"></i> Sleep / day
+          </label>
+          <div class="num-row">
+            <input id="sleep-hours" type="number" formControlName="sleep_hours"
+                   min="0" max="24" step="0.5" class="px-input" />
+            <span class="input-unit">hrs</span>
+          </div>
+          <small class="field-error">{{ fieldError('sleep_hours') }}</small>
+        </div>
+
+        <div class="field-block">
+          <label class="field-label" for="exercise-min">
+            <i class="fa-solid fa-person-running"></i> Exercise / day
+          </label>
+          <div class="num-row">
+            <input id="exercise-min" type="number" formControlName="exercise_minutes"
+                   min="0" max="300" step="5" class="px-input" />
+            <span class="input-unit">min</span>
+          </div>
+          <small class="field-error">{{ fieldError('exercise_minutes') }}</small>
+        </div>
+
+        <div class="field-block">
+          <label class="field-label" for="coffee">
+            <i class="fa-solid fa-mug-hot"></i> Coffee / day
+          </label>
+          <div class="num-row">
+            <input id="coffee" type="number" formControlName="coffee_intake"
+                   min="0" max="20" step="1" class="px-input" />
+            <span class="input-unit">cups</span>
+          </div>
+          <small class="field-error">{{ fieldError('coffee_intake') }}</small>
+        </div>
+
+        <div class="field-block field-block--full">
+          <label class="field-label" for="stress">
+            <i class="fa-solid fa-heart-crack"></i> Stress level
+            <span class="range-badge range-badge--stress-{{ getStressClass() }}">{{ rangeValue('stress_level') }} / 10</span>
+          </label>
+          <input id="stress" type="range" formControlName="stress_level"
+                 min="1" max="10" step="1" class="px-slider px-slider--stress" />
+          <div class="range-labels"><span>1 — calm</span><span>5</span><span>10 — max stress</span></div>
+          <small class="field-error">{{ fieldError('stress_level') }}</small>
+        </div>
+
+      </div>
+    </article>
+    }
+
+    <!-- ── Section 3: Digital Usage ── -->
+    @if (currentStep() === 3) {
+    <article class="px-panel section-panel section-delay-0">
+      <h2 class="px-panel__title"><i class="fa-solid fa-mobile-screen-button"></i> Digital Usage</h2>
+      <div class="field-grid">
+
+        <div class="field-block">
+          <label class="field-label" for="phone-hrs">
+            <i class="fa-solid fa-mobile-screen-button"></i> Phone / day
+          </label>
+          <div class="num-row">
+            <input id="phone-hrs" type="number" formControlName="phone_usage_hours"
+                   min="0" max="24" step="0.5" class="px-input" />
+            <span class="input-unit">hrs</span>
+          </div>
+          <small class="field-error">{{ fieldError('phone_usage_hours') }}</small>
+        </div>
+
+        <div class="field-block">
+          <label class="field-label" for="social-hrs">
+            <i class="fa-solid fa-hashtag"></i> Social media / day
+          </label>
+          <div class="num-row">
+            <input id="social-hrs" type="number" formControlName="social_media_hours"
+                   min="0" max="24" step="0.5" class="px-input" />
+            <span class="input-unit">hrs</span>
+          </div>
+          <small class="field-error">{{ fieldError('social_media_hours') }}</small>
+        </div>
+
+        <div class="field-block">
+          <label class="field-label" for="gaming-hrs">
+            <i class="fa-solid fa-gamepad"></i> Gaming / day
+          </label>
+          <div class="num-row">
+            <input id="gaming-hrs" type="number" formControlName="gaming_hours"
+                   min="0" max="24" step="0.5" class="px-input" />
+            <span class="input-unit">hrs</span>
+          </div>
+          <small class="field-error">{{ fieldError('gaming_hrs') }}</small>
+        </div>
+
+      </div>
+    </article>
+    }
+
+    <!-- ── Section 4: Performance ── -->
+    @if (currentStep() === 4) {
+    <article class="px-panel section-panel section-delay-0">
+      <h2 class="px-panel__title"><i class="fa-solid fa-graduation-cap"></i> Performance Metrics</h2>
+      <div class="field-grid">
+
+        <div class="field-block field-block--full">
+          <label class="field-label" for="attendance">
+            <i class="fa-solid fa-calendar-check"></i> Attendance
+            <span class="range-badge">{{ rangeValue('attendance_percentage') }}%</span>
+          </label>
+          <input id="attendance" type="range" formControlName="attendance_percentage"
+                 min="0" max="100" step="1" class="px-slider" />
+          <div class="range-labels"><span>0%</span><span>50%</span><span>100%</span></div>
+          <small class="field-error">{{ fieldError('attendance_percentage') }}</small>
+        </div>
+
+        <div class="field-block">
+          <label class="field-label" for="final-grade">
+            <i class="fa-solid fa-star"></i> Final grade
+            <span class="optional-badge">optional</span>
+          </label>
+          <div class="num-row">
+            <input id="final-grade" type="number" formControlName="final_grade"
+                   min="0" max="100" step="0.1" class="px-input" placeholder="—" />
+            <span class="input-unit">pts</span>
+          </div>
+          <small class="field-error">{{ fieldError('final_grade') }}</small>
+        </div>
+
+        <div class="field-block field-block--full">
+          <label class="optin-label">
+            <input type="checkbox" formControlName="grade_opt_in" class="px-checkbox" />
+            <span>I consent to use my grade data for analytics and recommendations.</span>
+          </label>
+        </div>
+
+      </div>
+    </article>
+    }
+
+    <!-- ── Actions ── -->
+    <div class="actions">
+      <button type="button" class="px-btn save-draft-btn" (click)="saveDraft()">
+        <i class="fa-solid fa-floppy-disk"></i> Save Draft
+      </button>
+
+      <div class="step-nav">
+        @if (currentStep() > 1) {
+          <button type="button" class="px-btn px-btn--ghost" (click)="prevStep()">
+            <i class="fa-solid fa-arrow-left"></i> Previous
+          </button>
+        }
+        @if (currentStep() < TOTAL_STEPS) {
+          <button type="button" class="px-btn px-btn--next" (click)="nextStep()">
+            Next <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        }
+        @if (currentStep() === TOTAL_STEPS) {
+          @if (errorMessage()) {
+            <button type="button" class="px-btn retry-btn" (click)="retryLastSubmission()" [disabled]="submitting()">
+              <i class="fa-solid fa-rotate-right"></i> Retry
+            </button>
+          }
+          <button type="submit" class="px-btn submit-btn" [disabled]="habitsForm.invalid || submitting()">
+            @if (submitting()) {
+              <i class="fa-solid fa-spinner fa-spin"></i> Submitting...
+            } @else {
+              <i class="fa-solid fa-paper-plane"></i> Submit Assessment
+            }
+          </button>
+        }
+      </div>
+    </div>
+
+  </form>
+</section>

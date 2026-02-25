@@ -5,6 +5,8 @@
     <nav class="px-nav__links">
       @if (auth.isAuthenticated()) {
         <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+        <a routerLink="/habits/assessment" routerLinkActive="active">Assessment</a>
+        <a routerLink="/habits/results" routerLinkActive="active">Results</a>
         <a routerLink="/profile" routerLinkActive="active">Profile</a>
         <span class="px-nav__user">{{ auth.user()?.name }}</span>
         <button type="button" class="px-btn" (click)="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>

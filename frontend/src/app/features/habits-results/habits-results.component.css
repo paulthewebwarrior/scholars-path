@@ -1,0 +1,516 @@
+/* ============================================================
+   habits-results.component.css
+   Retro pixel-art results dashboard – extends pixel-ui.css
+   ============================================================ */
+
+/* ---------- page enter / leave animations ---------- */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes page-leave {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-20px); }
+}
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes bar-expand {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { background: #e8e8e8; }
+  50%       { background: #f4f4f4; }
+}
+
+@keyframes badge-flash {
+  0%, 100% { background: #000; color: #fff; }
+  50%       { background: #cc0000; color: #fff; }
+}
+
+.results-page {
+  animation: page-enter 0.4s ease both;
+}
+
+.results-page.leaving {
+  animation: page-leave 0.36s ease both;
+  pointer-events: none;
+}
+
+/* ---------- results header ---------- */
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ---------- results badge ---------- */
+.results-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  padding: 0.45rem 0.75rem;
+  border: 2px solid #006622;
+  background: #006622;
+  color: #ffffff;
+  box-shadow: 3px 3px 0 #000;
+  line-height: 1.6;
+  max-width: 220px;
+  word-break: break-word;
+}
+
+.results-badge--loading {
+  background: #000;
+  border-color: #000;
+  box-shadow: 3px 3px 0 #ff0000;
+  animation: badge-flash 1.2s step-start infinite;
+}
+
+/* ---------- section heading ---------- */
+.section-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.82rem;
+  color: #000;
+  margin: 0 0 0.9rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
+  border-left: 4px solid #ff0000;
+  padding-left: 0.65rem;
+  box-shadow: -4px 0 0 #000;
+}
+
+.results-section {
+  display: grid;
+  gap: 0.75rem;
+}
+
+/* ---------- panel entrance (stagger) ---------- */
+.results-panel {
+  animation: card-in 0.45s ease backwards;
+}
+
+.results-delay-1 { animation-delay: 120ms; }
+.results-delay-2 { animation-delay: 240ms; }
+.results-delay-3 { animation-delay: 360ms; }
+
+/* ---------- skeleton loading ---------- */
+.skeleton-grid {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.skeleton-card,
+.skeleton-panel {
+  border: 2px solid #ccc;
+  box-shadow: 4px 4px 0 #ddd;
+  height: 90px;
+  animation: skeleton-pulse 1.3s ease infinite;
+}
+
+.skeleton-panel {
+  height: auto;
+  padding: 1.25rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.skeleton-line {
+  height: 10px;
+  background: #ccc;
+  animation: skeleton-pulse 1.3s ease infinite;
+}
+
+.sk-short { width: 55%; }
+
+/* ---------- metrics grid ---------- */
+.metrics-grid {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+}
+
+/* ---------- metric card ---------- */
+.metric-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 2px solid #000;
+  padding: 0.75rem;
+  background: #fff;
+  box-shadow: 4px 4px 0 #000;
+  position: relative;
+  overflow: hidden;
+  animation: card-in 0.4s ease backwards;
+  transition: box-shadow 0.12s, transform 0.12s;
+}
+
+.metric-card:hover {
+  box-shadow: 6px 6px 0 #ff0000;
+  transform: translate(-1px, -1px);
+}
+
+/* colour variants */
+.metric-card--good { box-shadow: 4px 4px 0 #006622; }
+.metric-card--good:hover { box-shadow: 6px 6px 0 #006622; }
+
+.metric-card--warn { box-shadow: 4px 4px 0 #cc6600; }
+.metric-card--warn:hover { box-shadow: 6px 6px 0 #cc6600; }
+
+.metric-card--bad  { box-shadow: 4px 4px 0 #cc0000; }
+.metric-card--bad:hover  { box-shadow: 6px 6px 0 #cc0000; }
+
+.metric-card__icon {
+  font-size: 1.3rem;
+  width: 2rem;
+  text-align: center;
+  flex-shrink: 0;
+  color: #000;
+}
+
+.metric-card--good .metric-card__icon { color: #006622; }
+.metric-card--warn .metric-card__icon { color: #cc6600; }
+.metric-card--bad  .metric-card__icon { color: #cc0000; }
+
+.metric-card__body {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.metric-card__label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metric-card__value {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.9rem;
+  color: #000;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.metric-card__unit {
+  font-size: 0.5rem;
+  color: #888;
+  margin-left: 0.2em;
+}
+
+/* status dot corner */
+.metric-card__status-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid #000;
+  background: #888;
+}
+
+.metric-card--good .metric-card__status-dot { background: #006622; border-color: #006622; }
+.metric-card--warn .metric-card__status-dot { background: #cc6600; border-color: #cc6600; }
+.metric-card--bad  .metric-card__status-dot { background: #cc0000; border-color: #cc0000; }
+
+/* ---------- correlations ---------- */
+.corr-note {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.56rem;
+  color: #555;
+  line-height: 1.7;
+  margin: 0 0 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+}
+
+.empty-state {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.62rem;
+  color: #888;
+}
+
+.corr-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.corr-item {
+  display: grid;
+  gap: 0.3rem;
+  animation: card-in 0.4s ease backwards;
+}
+
+.corr-item__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.corr-item__name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.62rem;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.corr-item__coeff {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.62rem;
+  padding: 0.2em 0.5em;
+  border: 2px solid #000;
+}
+
+.corr-item__coeff--pos { color: #006622; border-color: #006622; background: #f0fff4; }
+.corr-item__coeff--neg { color: #cc0000; border-color: #cc0000; background: #fff4f4; }
+
+.corr-bar-track {
+  height: 10px;
+  border: 2px solid #000;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 2px 2px 0 #000;
+}
+
+.corr-bar {
+  height: 100%;
+  transform-origin: left;
+  animation: bar-expand 0.6s ease backwards;
+}
+
+.corr-bar--pos { background: #006622; }
+.corr-bar--neg { background: #cc0000; }
+
+.corr-item__ci {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  color: #888;
+  letter-spacing: 0.03em;
+}
+
+/* ---------- quest cards (recommendations) ---------- */
+.quest-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.quest-card {
+  border: 2px solid #000;
+  padding: 1rem 1.1rem;
+  background: #fff;
+  box-shadow: 5px 5px 0 #000;
+  display: grid;
+  gap: 0.55rem;
+  animation: card-in 0.45s ease backwards;
+  transition: box-shadow 0.1s, transform 0.1s;
+}
+
+.quest-card:hover {
+  box-shadow: 7px 7px 0 #ff0000;
+  transform: translate(-1px, -1px);
+}
+
+.quest-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.quest-rank {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  background: #000;
+  color: #fff;
+  padding: 0.25em 0.5em;
+  box-shadow: 2px 2px 0 #ff0000;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.quest-card__text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.62rem;
+  color: #111;
+  margin: 0;
+  line-height: 1.9;
+}
+
+.quest-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.quest-card__meta span {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.52rem;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+}
+
+/* status badge */
+.quest-status {
+  padding: 0.2em 0.5em;
+  border: 2px solid #888;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.quest-status--attempted  { border-color: #cc6600; color: #cc6600; }
+.quest-status--completed  { border-color: #006622; color: #006622; background: #f0fff4; }
+.quest-status--not_applicable { border-color: #000; color: #000; }
+
+/* why button */
+.why-btn {
+  font-size: 0.58rem;
+  padding: 0.5rem 0.85rem;
+  box-shadow: 2px 2px 0 #ff0000;
+  align-self: start;
+}
+
+.why-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.58rem;
+  color: #333;
+  line-height: 2;
+  border-left: 3px solid #ff0000;
+  padding-left: 0.75rem;
+  margin: 0;
+}
+
+/* feedback row */
+.feedback-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.feedback-btn {
+  font-size: 0.58rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.feedback-btn--attempted         { box-shadow: 2px 2px 0 #cc6600; }
+.feedback-btn--attempted.active  { background: #cc6600; color: #fff; border-color: #cc6600; box-shadow: 2px 2px 0 #000; }
+
+.feedback-btn--completed         { box-shadow: 2px 2px 0 #006622; }
+.feedback-btn--completed.active  { background: #006622; color: #fff; border-color: #006622; box-shadow: 2px 2px 0 #000; }
+
+.feedback-btn--na                { box-shadow: 2px 2px 0 #000; }
+.feedback-btn--na.active         { background: #000; color: #fff; box-shadow: 2px 2px 0 #888; }
+
+/* ---------- delta (progress snapshot) ---------- */
+.delta-grid {
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  margin-top: 0.5rem;
+}
+
+.delta-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  border: 2px solid #000;
+  padding: 0.55rem 0.75rem;
+  background: #fff;
+  box-shadow: 3px 3px 0 #000;
+}
+
+.delta-card__label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.52rem;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.delta-card__arrow {
+  font-size: 1.1rem;
+  font-family: monospace;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.delta-arrow--up      { color: #006622; }
+.delta-arrow--down    { color: #cc0000; }
+.delta-arrow--neutral { color: #888; }
+
+.delta-card__value {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.58rem;
+  color: #000;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ---------- bottom actions bar ---------- */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  padding-top: 0.5rem;
+  border-top: 3px solid #000;
+}
+
+/* ---------- retake pixel button ---------- */
+.retake-btn {
+  background: #ffffff;
+  color: #000000;
+  border: 3px solid #000000;
+  padding: 0.85rem 1.35rem;
+  box-shadow: 5px 5px 0 #ff0000;
+  font-size: 0.68rem;
+}
+
+.retake-btn:hover:not(:disabled) {
+  background: #fff0f0;
+  box-shadow: 7px 7px 0 #ff0000;
+  transform: translate(-1px, -1px);
+}
+
+.retake-btn:active:not(:disabled) {
+  box-shadow: 2px 2px 0 #ff0000;
+  transform: translate(2px, 2px);
+}
+
