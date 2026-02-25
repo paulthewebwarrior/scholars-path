@@ -1,65 +1,6 @@
-.auth-card {
+/* Register extends the shared auth card to be slightly wider */
+/* All base styles live in auth.shared.css */
+
+.register-card {
   max-width: 520px;
-  margin: 2rem auto;
-  border: 1px solid var(--surface-border);
-  border-radius: 0.75rem;
-  padding: 1.25rem;
-  background: var(--surface-muted);
-}
-
-form {
-  display: grid;
-  gap: 0.75rem;
-}
-
-input,
-select,
-button {
-  font: inherit;
-}
-
-input,
-select {
-  border: 1px solid var(--surface-border);
-  border-radius: 0.5rem;
-  padding: 0.55rem 0.65rem;
-  background: var(--surface);
-}
-
-button {
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.6rem 0.75rem;
-  cursor: pointer;
-}
-
-button:disabled {
-  background: #93a4b8;
-  cursor: not-allowed;
-}
-
-.field-feedback {
-  margin: 0;
-  color: var(--muted-text);
-}
-
-.password-checklist {
-  margin: 0;
-  padding-left: 1rem;
-  color: var(--muted-text);
-}
-
-.password-checklist .pass {
-  color: #117a45;
-}
-
-.error-message {
-  margin: 0;
-  color: #b42318;
-}
-
-.meta-link {
-  margin-bottom: 0;
 }

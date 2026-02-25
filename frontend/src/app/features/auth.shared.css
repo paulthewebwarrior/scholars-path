@@ -1,0 +1,211 @@
+/* ============================================================
+   Shared pixel-art / retro game auth styles
+   Used by: login.component, register.component
+   ============================================================ */
+
+/* ---------- page wrapper ---------- */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background: #ffffff;
+}
+
+/* ---------- page heading ---------- */
+.auth-page__title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  letter-spacing: 0.08em;
+  color: #000000;
+  margin: 0 0 0.5rem;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.auth-page__subtitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.6rem, 1.5vw, 0.82rem);
+  color: #444444;
+  margin: 0 0 2rem;
+  text-align: center;
+  line-height: 1.8;
+}
+
+/* ---------- card ---------- */
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border: 3px solid #000000;
+  box-shadow: 7px 7px 0 #ff0000;
+  padding: 2rem 2.25rem 1.75rem;
+  position: relative;
+}
+
+/* ---------- card icon ---------- */
+.auth-card__icon {
+  display: block;
+  text-align: center;
+  font-size: 2.8rem;
+  margin: 0 0 1.5rem;
+  line-height: 1;
+  color: #000000;
+}
+
+/* ---------- form ---------- */
+.auth-form {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.auth-form label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.75rem;
+  color: #000000;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-top: 0.4rem;
+}
+
+.auth-form input,
+.auth-form select {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.72rem;
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 0;
+  padding: 0.8rem 0.9rem;
+  width: 100%;
+  color: #000000;
+  outline: none;
+  transition: box-shadow 0.1s;
+}
+
+.auth-form input::placeholder {
+  color: #aaaaaa;
+}
+
+.auth-form input:focus,
+.auth-form select:focus {
+  box-shadow: 3px 3px 0 #ff0000;
+}
+
+/* ---------- submit button ---------- */
+.auth-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.82rem;
+  background: #ffffff;
+  color: #000000;
+  border: 3px solid #000000;
+  border-radius: 0;
+  padding: 1rem 1.1rem;
+  width: 100%;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 0.75rem;
+  box-shadow: 4px 4px 0 #ff0000;
+  transition: box-shadow 0.1s, transform 0.1s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55em;
+}
+
+.auth-btn:hover:not(:disabled) {
+  box-shadow: 6px 6px 0 #ff0000;
+  transform: translate(-1px, -1px);
+}
+
+.auth-btn:active:not(:disabled) {
+  box-shadow: 2px 2px 0 #ff0000;
+  transform: translate(2px, 2px);
+}
+
+.auth-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ---------- feedback messages ---------- */
+.auth-error {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  color: #cc0000;
+  margin: 0.25rem 0 0;
+  line-height: 1.7;
+}
+
+.auth-success {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  color: #006622;
+  margin: 0 0 0.75rem;
+  line-height: 1.7;
+}
+
+/* ---------- field-level hint / checklist ---------- */
+.auth-hint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.62rem;
+  color: #666666;
+  margin: 0.1rem 0 0;
+  line-height: 1.8;
+}
+
+.auth-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0.1rem 0 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.auth-checklist li {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.62rem;
+  color: #aaaaaa;
+  padding-left: 1.2rem;
+  position: relative;
+  line-height: 1.6;
+}
+
+.auth-checklist li::before {
+  content: '✗';
+  position: absolute;
+  left: 0;
+  color: #cc0000;
+}
+
+.auth-checklist li.pass {
+  color: #006622;
+}
+
+.auth-checklist li.pass::before {
+  content: '✓';
+  color: #006622;
+}
+
+/* ---------- meta link ---------- */
+.auth-meta {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  color: #444444;
+  text-align: center;
+  margin: 1.25rem 0 0;
+  line-height: 1.8;
+}
+
+.auth-meta a {
+  color: #cc0000;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.auth-meta a:hover {
+  color: #000000;
+}

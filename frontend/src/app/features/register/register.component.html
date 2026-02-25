@@ -1,47 +1,65 @@
-<section class="auth-card">
-  <h1>Create account</h1>
+<div class="auth-page">
+  <h1 class="auth-page__title">Hackathon</h1>
+  <p class="auth-page__subtitle">Create Your Player Profile</p>
 
-  <form [formGroup]="registerForm" (ngSubmit)="submit()">
-    <label for="email">Email</label>
-    <input id="email" type="email" formControlName="email" autocomplete="email" />
-    @if (registerForm.controls.email.dirty && registerForm.controls.email.errors?.['email']) {
-      <p class="field-feedback">Invalid email format</p>
-    }
+  <div class="auth-card register-card">
+    <span class="auth-card__icon" aria-hidden="true"><i class="fa-solid fa-user-plus"></i></span>
 
-    <label for="password">Password</label>
-    <input id="password" type="password" formControlName="password" autocomplete="new-password" />
-    <p class="field-feedback">Strength: {{ passwordStrength().label }}</p>
-    <ul class="password-checklist">
-      <li [class.pass]="passwordStrength().checks.length">At least 8 characters</li>
-      <li [class.pass]="passwordStrength().checks.uppercase">One uppercase letter</li>
-      <li [class.pass]="passwordStrength().checks.lowercase">One lowercase letter</li>
-      <li [class.pass]="passwordStrength().checks.number">One number</li>
-    </ul>
-
-    <label for="name">Full name</label>
-    <input id="name" type="text" formControlName="name" autocomplete="name" />
-
-    <label for="course">Course</label>
-    <input id="course" type="text" formControlName="course" />
-
-    <label for="year-level">Year level</label>
-    <select id="year-level" formControlName="year_level">
-      @for (year of yearLevels; track year) {
-        <option [value]="year">{{ year }}</option>
+    <form class="auth-form" [formGroup]="registerForm" (ngSubmit)="submit()">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        placeholder="your@email.com"
+      />
+      @if (registerForm.controls.email.dirty && registerForm.controls.email.errors?.['email']) {
+        <p class="auth-hint auth-error">Invalid email format</p>
       }
-    </select>
 
-    <label for="career-goal">Career goal</label>
-    <input id="career-goal" type="text" formControlName="career_goal" />
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        autocomplete="new-password"
+        placeholder="············"
+      />
+      <p class="auth-hint">Strength: {{ passwordStrength().label }}</p>
+      <ul class="auth-checklist">
+        <li [class.pass]="passwordStrength().checks.length">At least 8 characters</li>
+        <li [class.pass]="passwordStrength().checks.uppercase">One uppercase letter</li>
+        <li [class.pass]="passwordStrength().checks.lowercase">One lowercase letter</li>
+        <li [class.pass]="passwordStrength().checks.number">One number</li>
+      </ul>
 
-    @if (serverError()) {
-      <p class="error-message">{{ serverError() }}</p>
-    }
+      <label for="name">Full Name</label>
+      <input id="name" type="text" formControlName="name" autocomplete="name" placeholder="Your full name" />
 
-    <button type="submit" [disabled]="registerForm.invalid || loading()">
-      {{ loading() ? 'Creating account...' : 'Register' }}
-    </button>
-  </form>
+      <label for="course">Course</label>
+      <input id="course" type="text" formControlName="course" placeholder="e.g. Computer Science" />
 
-  <p class="meta-link">Already have an account? <a routerLink="/login">Sign in</a>.</p>
-</section>
+      <label for="year-level">Year Level</label>
+      <select id="year-level" formControlName="year_level">
+        @for (year of yearLevels; track year) {
+          <option [value]="year">{{ year }}</option>
+        }
+      </select>
+
+      <label for="career-goal">Career Goal</label>
+      <input id="career-goal" type="text" formControlName="career_goal" placeholder="e.g. Software Engineer" />
+
+      @if (serverError()) {
+        <p class="auth-error">{{ serverError() }}</p>
+      }
+
+      <button class="auth-btn" type="submit" [disabled]="registerForm.invalid || loading()">
+        @if (!loading()) { <i class="fa-solid fa-shield-halved"></i> } @else { <i class="fa-solid fa-spinner fa-spin"></i> }
+        {{ loading() ? 'Loading...' : 'Join Quest' }}
+      </button>
+    </form>
+
+    <p class="auth-meta">Already have an account?&nbsp;<a routerLink="/login">Sign In</a>.</p>
+  </div>
+</div>

@@ -1,18 +1,32 @@
-<section class="page-shell">
-  <h1>Dashboard</h1>
-  <p class="subtitle">Welcome back, {{ auth.user()?.name }}.</p>
+<section class="px-page">
+  <div>
+    <h1 class="px-page-title">Dashboard</h1>
+    <p class="px-page-subtitle">Welcome back, {{ auth.user()?.name }}.</p>
+  </div>
 
-  <div class="panel-grid">
-    <article class="panel">
-      <h2>Account</h2>
-      <p>Course: {{ auth.user()?.course }}</p>
-      <p>Year Level: {{ auth.user()?.year_level }}</p>
-      <a routerLink="/profile">Manage profile</a>
+  <div class="px-panel-grid">
+    <article class="px-panel">
+      <h2 class="px-panel__title"><i class="fa-solid fa-user"></i> Account</h2>
+      <div class="px-panel__body">
+        <p>Course: {{ auth.user()?.course }}</p>
+        <p>Year Level: {{ auth.user()?.year_level }}</p>
+      </div>
+      <a class="px-panel__link" routerLink="/profile"><i class="fa-solid fa-arrow-right"></i> Manage profile</a>
     </article>
 
-    <article class="panel">
-      <h2>Next Step</h2>
-      <p>Continue with study-habit assessment to generate personalized recommendations.</p>
+    <article class="px-panel">
+      <h2 class="px-panel__title"><i class="fa-solid fa-scroll"></i> Next Quest</h2>
+      <div class="px-panel__body">
+        <p>Complete your study-habit assessment to unlock personalized recommendations.</p>
+      </div>
+    </article>
+
+    <article class="px-panel">
+      <h2 class="px-panel__title"><i class="fa-solid fa-chart-line"></i> Progress</h2>
+      <div class="px-panel__body">
+        <p>Career Goal: {{ auth.user()?.career_goal || 'Not set' }}</p>
+      </div>
+      <a class="px-panel__link" routerLink="/profile"><i class="fa-solid fa-arrow-right"></i> Set career goal</a>
     </article>
   </div>
 </section>

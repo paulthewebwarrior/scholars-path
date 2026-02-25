@@ -1,59 +1,59 @@
-<section class="profile-shell">
-  <header class="profile-header">
+<section class="px-page">
+  <div class="px-section-header">
     <div>
-      <h1>My Profile</h1>
-      <p>Manage your personal details for personalized recommendations.</p>
+      <h1 class="px-page-title"><i class="fa-solid fa-id-card"></i> My Profile</h1>
+      <p class="px-page-subtitle">Manage your details for personalized recommendations.</p>
     </div>
 
-    <div class="actions">
+    <div class="px-action-row">
       @if (!editing()) {
-        <button type="button" class="secondary" (click)="startEdit()">Edit profile</button>
+        <button type="button" class="px-btn px-btn--secondary" (click)="startEdit()"><i class="fa-solid fa-pen"></i> Edit Profile</button>
       } @else {
-        <button type="button" class="secondary" (click)="cancelEdit()">Cancel</button>
+        <button type="button" class="px-btn" (click)="cancelEdit()"><i class="fa-solid fa-xmark"></i> Cancel</button>
       }
-      <button type="button" class="danger" (click)="logout()">Logout</button>
+      <button type="button" class="px-btn px-btn--danger" (click)="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
     </div>
-  </header>
+  </div>
 
   @if (loading()) {
-    <p>Loading profile...</p>
+    <p class="px-page-subtitle">Loading profile...</p>
   } @else {
     @if (successMessage()) {
-      <p class="success-message">{{ successMessage() }}</p>
+      <p class="px-msg px-msg--success">{{ successMessage() }}</p>
     }
-
     @if (errorMessage()) {
-      <p class="error-message">{{ errorMessage() }}</p>
+      <p class="px-msg px-msg--error">{{ errorMessage() }}</p>
     }
 
     @if (!editing()) {
-      <dl class="profile-list">
-        <div><dt>Name</dt><dd>{{ auth.user()?.name }}</dd></div>
-        <div><dt>Email</dt><dd>{{ auth.user()?.email }}</dd></div>
-        <div><dt>Course</dt><dd>{{ auth.user()?.course }}</dd></div>
-        <div><dt>Year Level</dt><dd>{{ auth.user()?.year_level }}</dd></div>
-        <div><dt>Career Goal</dt><dd>{{ auth.user()?.career_goal || 'Not set' }}</dd></div>
+      <dl class="px-data-list">
+        <div class="px-data-row"><dt>Name</dt><dd>{{ auth.user()?.name }}</dd></div>
+        <div class="px-data-row"><dt>Email</dt><dd>{{ auth.user()?.email }}</dd></div>
+        <div class="px-data-row"><dt>Course</dt><dd>{{ auth.user()?.course }}</dd></div>
+        <div class="px-data-row"><dt>Year Level</dt><dd>{{ auth.user()?.year_level }}</dd></div>
+        <div class="px-data-row"><dt>Career Goal</dt><dd>{{ auth.user()?.career_goal || 'Not set' }}</dd></div>
       </dl>
     } @else {
-      <form [formGroup]="profileForm" (ngSubmit)="save()" class="profile-form">
+      <form [formGroup]="profileForm" (ngSubmit)="save()" class="px-profile-form">
         <label for="name">Name</label>
-        <input id="name" type="text" formControlName="name" />
+        <input id="name" type="text" formControlName="name" placeholder="Your full name" />
 
         <label for="course">Course</label>
-        <input id="course" type="text" formControlName="course" />
+        <input id="course" type="text" formControlName="course" placeholder="e.g. Computer Science" />
 
-        <label for="year-level">Year level</label>
+        <label for="year-level">Year Level</label>
         <select id="year-level" formControlName="year_level">
           @for (year of yearLevels; track year) {
             <option [value]="year">{{ year }}</option>
           }
         </select>
 
-        <label for="career-goal">Career goal</label>
-        <textarea id="career-goal" formControlName="career_goal" rows="3"></textarea>
+        <label for="career-goal">Career Goal</label>
+        <textarea id="career-goal" formControlName="career_goal" rows="3" placeholder="e.g. Software Engineer"></textarea>
 
-        <button type="submit" [disabled]="profileForm.invalid || saving()">
-          {{ saving() ? 'Saving...' : 'Save changes' }}
+        <button type="submit" class="px-btn" [disabled]="profileForm.invalid || saving()">
+          @if (!saving()) { <i class="fa-solid fa-floppy-disk"></i> } @else { <i class="fa-solid fa-spinner fa-spin"></i> }
+          {{ saving() ? 'Saving...' : 'Save Changes' }}
         </button>
       </form>
     }

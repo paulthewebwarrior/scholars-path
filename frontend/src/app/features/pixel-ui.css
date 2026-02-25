@@ -1,0 +1,347 @@
+/* ============================================================
+   pixel-ui.css  –  Shared retro / pixel-art design system
+   Used by: app (shell + nav), dashboard, profile, and any
+   future page that follows the game-themed aesthetic.
+   ============================================================ */
+
+/* ---------- typography ---------- */
+.px-font {
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* ---------- icon spacing helpers ---------- */
+.px-btn i,
+.px-btn .fa-solid {
+  margin-right: 0.45em;
+}
+
+.px-panel__title i,
+.px-panel__title .fa-solid {
+  margin-right: 0.55em;
+}
+
+.px-page-title i,
+.px-page-title .fa-solid {
+  margin-right: 0.45em;
+}
+
+/* ---------- page shell ---------- */
+.px-page {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1.5rem 0 3rem;
+}
+
+.px-page-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
+  color: #000000;
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+
+.px-page-subtitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  color: #555555;
+  margin: 0;
+  line-height: 1.9;
+}
+
+/* ---------- top navigation bar ---------- */
+.px-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.5rem;
+  height: 5rem;
+  background: #ffffff;
+  border-bottom: 3px solid #000000;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.px-nav__brand {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.8rem, 2vw, 1.05rem);
+  color: #000000;
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.px-nav__links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.px-nav__links a {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.68rem;
+  color: #000000;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.1s, color 0.1s;
+}
+
+.px-nav__links a:hover {
+  color: #cc0000;
+  border-bottom-color: #cc0000;
+}
+
+.px-nav__links a.active {
+  color: #cc0000;
+  border-bottom-color: #cc0000;
+}
+
+.px-nav__user {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.62rem;
+  color: #555555;
+  letter-spacing: 0.03em;
+}
+
+/* ---------- pixel button ---------- */
+.px-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.68rem;
+  background: #ffffff;
+  color: #000000;
+  border: 2px solid #000000;
+  padding: 0.7rem 1.1rem;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: 3px 3px 0 #ff0000;
+  transition: box-shadow 0.1s, transform 0.1s;
+  line-height: 1.5;
+  display: inline-flex;
+  align-items: center;
+}
+
+.px-btn:hover:not(:disabled) {
+  box-shadow: 5px 5px 0 #ff0000;
+  transform: translate(-1px, -1px);
+}
+
+.px-btn:active:not(:disabled) {
+  box-shadow: 1px 1px 0 #ff0000;
+  transform: translate(2px, 2px);
+}
+
+.px-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* secondary – dark fill */
+.px-btn--secondary {
+  background: #000000;
+  color: #ffffff;
+  box-shadow: 3px 3px 0 #666666;
+}
+
+.px-btn--secondary:hover:not(:disabled) {
+  box-shadow: 5px 5px 0 #666666;
+}
+
+.px-btn--secondary:active:not(:disabled) {
+  box-shadow: 1px 1px 0 #666666;
+}
+
+/* danger – red style */
+.px-btn--danger {
+  background: #ffffff;
+  color: #cc0000;
+  border-color: #cc0000;
+  box-shadow: 3px 3px 0 #000000;
+}
+
+.px-btn--danger:hover:not(:disabled) {
+  box-shadow: 5px 5px 0 #000000;
+}
+
+.px-btn--danger:active:not(:disabled) {
+  box-shadow: 1px 1px 0 #000000;
+}
+
+/* ---------- panel grid ---------- */
+.px-panel-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+/* ---------- panel card ---------- */
+.px-panel {
+  background: #ffffff;
+  border: 3px solid #000000;
+  box-shadow: 6px 6px 0 #ff0000;
+  padding: 1.25rem 1.35rem;
+}
+
+.px-panel__title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  color: #000000;
+  margin: 0 0 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+}
+
+.px-panel__body {
+  font-size: 0.82rem;
+  color: #333333;
+  line-height: 1.6;
+}
+
+.px-panel__body p {
+  margin: 0.3rem 0;
+}
+
+.px-panel__link {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.62rem;
+  color: #cc0000;
+  text-decoration: none;
+  letter-spacing: 0.03em;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.1s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  margin-top: 0.8rem;
+}
+
+.px-panel__link:hover {
+  border-bottom-color: #cc0000;
+}
+
+/* ---------- profile data list ---------- */
+.px-data-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.px-data-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  border: 2px solid #000000;
+  padding: 0.7rem 0.9rem;
+  box-shadow: 4px 4px 0 #ff0000;
+}
+
+.px-data-row dt {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.62rem;
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  min-width: 9rem;
+}
+
+.px-data-row dd {
+  margin: 0;
+  font-size: 0.92rem;
+  color: #333333;
+}
+
+/* ---------- profile form ---------- */
+.px-profile-form {
+  display: grid;
+  gap: 0.6rem;
+  max-width: 560px;
+}
+
+.px-profile-form label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  color: #000000;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: 0.4rem;
+}
+
+.px-profile-form input,
+.px-profile-form select,
+.px-profile-form textarea {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.72rem;
+  background: #ffffff;
+  border: 2px solid #000000;
+  padding: 0.7rem 0.85rem;
+  color: #000000;
+  outline: none;
+  transition: box-shadow 0.1s;
+  resize: vertical;
+}
+
+.px-profile-form input:focus,
+.px-profile-form select:focus,
+.px-profile-form textarea:focus {
+  box-shadow: 3px 3px 0 #ff0000;
+}
+
+/* ---------- feedback messages ---------- */
+.px-msg {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.px-msg--success { color: #006622; }
+.px-msg--error   { color: #cc0000; }
+
+/* ---------- section header row ---------- */
+.px-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.px-action-row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 640px) {
+  .px-nav {
+    height: auto;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.75rem 1rem;
+    gap: 0.6rem;
+  }
+
+  .px-nav__links {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .px-data-row {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .px-data-row dt {
+    min-width: unset;
+  }
+}

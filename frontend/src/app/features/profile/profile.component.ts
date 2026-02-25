@@ -13,7 +13,7 @@ const YEAR_LEVELS = ['Freshman', 'Sophomore', 'Junior', 'Senior'] as const;
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './profile.component.html',
-  styleUrl: './profile.component.css',
+  styleUrls: ['../pixel-ui.css', './profile.component.css'],
 })
 export class ProfileComponent {
   private readonly fb = inject(FormBuilder);

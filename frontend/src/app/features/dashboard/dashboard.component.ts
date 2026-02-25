@@ -9,7 +9,7 @@ import { AuthService } from '../../core/auth/auth.service';
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css',
+  styleUrls: ['../pixel-ui.css', './dashboard.component.css'],
 })
 export class DashboardComponent {
   protected readonly auth = inject(AuthService);

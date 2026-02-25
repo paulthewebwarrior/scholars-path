@@ -14,7 +14,7 @@ const YEAR_LEVELS = ['Freshman', 'Sophomore', 'Junior', 'Senior'] as const;
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './register.component.html',
-  styleUrl: './register.component.css',
+  styleUrls: ['../auth.shared.css', './register.component.css'],
 })
 export class RegisterComponent {
   private readonly fb = inject(FormBuilder);
