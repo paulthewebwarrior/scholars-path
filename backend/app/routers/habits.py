@@ -25,6 +25,11 @@ logger = logging.getLogger(__name__)
 
 def _validate_user_access(user_id: int, current_user: User) -> None:
     if user_id != current_user.id:
+        logger.warning(
+            'habits.access_denied requested_user_id=%s authenticated_user_id=%s',
+            user_id,
+            current_user.id,
+        )
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Forbidden')
 
 
@@ -36,7 +41,7 @@ def submit_assessment(
     current_user: User = Depends(get_current_user),
 ) -> HabitsAssessmentResponse:
     _validate_user_access(user_id, current_user)
-    logger.info('audit habits-assessment-submit user_id=%s', user_id)
+    logger.info('habits.assessment.submit.start user_id=%s', user_id)
 
     assessment = HabitsAssessment(user_id=user_id, **payload.model_dump())
     db.add(assessment)
@@ -49,16 +54,28 @@ def submit_assessment(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='Unable to store habits assessment',
         ) from exc
+    logger.info(
+        'habits.assessment.submit.saved user_id=%s assessment_id=%s',
+        user_id,
+        assessment.assessment_id,
+    )
 
     correlations = recompute_correlations(db)
     if not correlations:
         correlations = list(db.scalars(select(HabitsCorrelation)).all())
+    logger.info('habits.assessment.submit.correlations user_id=%s count=%s', user_id, len(correlations))
 
     generator = RecommendationGenerator()
     recommendations = generator.generate(assessment, correlations)
     for recommendation in recommendations:
         db.add(recommendation)
     db.commit()
+    logger.info(
+        'habits.assessment.submit.recommendations user_id=%s assessment_id=%s count=%s',
+        user_id,
+        assessment.assessment_id,
+        len(recommendations),
+    )
 
     return HabitsAssessmentResponse.model_validate(assessment)
 
@@ -70,7 +87,7 @@ def get_latest_assessment(
     current_user: User = Depends(get_current_user),
 ) -> HabitsAssessmentResponse:
     _validate_user_access(user_id, current_user)
-    logger.info('audit habits-assessment-latest user_id=%s', user_id)
+    logger.info('habits.assessment.latest.start user_id=%s', user_id)
 
     assessment = db.scalar(
         select(HabitsAssessment)
@@ -78,7 +95,9 @@ def get_latest_assessment(
         .order_by(HabitsAssessment.created_at.desc())
     )
     if assessment is None:
+        logger.info('habits.assessment.latest.empty user_id=%s', user_id)
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='No assessments found')
+    logger.info('habits.assessment.latest.success user_id=%s assessment_id=%s', user_id, assessment.assessment_id)
     return HabitsAssessmentResponse.model_validate(assessment)
 
 
@@ -91,7 +110,12 @@ def get_assessment_history(
     current_user: User = Depends(get_current_user),
 ) -> HabitsAssessmentHistoryResponse:
     _validate_user_access(user_id, current_user)
-    logger.info('audit habits-assessment-history user_id=%s page=%s page_size=%s', user_id, page, page_size)
+    logger.info(
+        'habits.assessment.history.start user_id=%s page=%s page_size=%s',
+        user_id,
+        page,
+        page_size,
+    )
 
     total = db.scalar(
         select(func.count())
@@ -141,6 +165,7 @@ def get_correlations(
             )
         ).all()
     )
+    logger.info('habits.correlations.success user_id=%s count=%s', user_id, len(rows))
     return [HabitsCorrelationResponse.model_validate(item) for item in rows]
 
 
@@ -176,6 +201,7 @@ def get_recommendations(
             )
         ).all()
     )
+    logger.info('habits.recommendations.success user_id=%s count=%s', user_id, len(items))
     return HabitsRecommendationsListResponse(
         items=[HabitsRecommendationResponse.model_validate(item) for item in items]
     )
@@ -190,6 +216,12 @@ def update_recommendation_feedback(
     current_user: User = Depends(get_current_user),
 ) -> HabitsRecommendationResponse:
     _validate_user_access(user_id, current_user)
+    logger.info(
+        'habits.recommendation.feedback.start user_id=%s recommendation_id=%s status=%s',
+        user_id,
+        recommendation_id,
+        status_value,
+    )
 
     recommendation = db.scalar(
         select(HabitsRecommendation).where(
@@ -198,9 +230,19 @@ def update_recommendation_feedback(
         )
     )
     if recommendation is None:
+        logger.info(
+            'habits.recommendation.feedback.not_found user_id=%s recommendation_id=%s',
+            user_id,
+            recommendation_id,
+        )
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Recommendation not found')
     recommendation.status = status_value
     recommendation.status_updated_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(recommendation)
+    logger.info(
+        'habits.recommendation.feedback.success user_id=%s recommendation_id=%s',
+        user_id,
+        recommendation_id,
+    )
     return HabitsRecommendationResponse.model_validate(recommendation)
