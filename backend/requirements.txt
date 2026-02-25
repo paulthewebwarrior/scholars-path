@@ -5,3 +5,13 @@ matplotlib
 scikit-learn
 joblib
 xgboost
+fastapi
+uvicorn[standard]
+sqlalchemy
+python-jose[cryptography]
+bcrypt==4.3.0
+pydantic-settings
+email-validator
+python-multipart
+pytest
+httpx
