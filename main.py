@@ -21,6 +21,8 @@ from sklearn.preprocessing import OneHotEncoder
 RANDOM_STATE = 42
 TARGET_COLUMN = "G3"
 LEAKAGE_COLUMNS = ["G1", "G2"]
+GRADE_MIN = 0.0
+GRADE_MAX = 20.0
 
 
 def load_student_data(student_dir: Path) -> pd.DataFrame:
@@ -191,6 +193,103 @@ def create_relationship_reports(data: pd.DataFrame, output_dir: Path) -> None:
         )
 
 
+def grade_to_productivity_score(
+    grade: pd.Series | np.ndarray | float,
+    grade_min: float = GRADE_MIN,
+    grade_max: float = GRADE_MAX,
+) -> pd.Series | np.ndarray | float:
+    """
+    Convert grade values (0-20 scale) into a standardized productivity score (0-100).
+
+    Formula:
+        productivity_score = clip((grade - grade_min) / (grade_max - grade_min), 0, 1) * 100
+
+    Why this works:
+    - Preserves rank order (monotonic transformation).
+    - Produces an interpretable percentage-like score.
+    - Keeps compatibility with both ground-truth and model-predicted grades.
+    """
+    if grade_max <= grade_min:
+        raise ValueError("grade_max must be greater than grade_min.")
+
+    scaled = (grade - grade_min) / (grade_max - grade_min)
+    clipped = np.clip(scaled, 0.0, 1.0)
+    return clipped * 100.0
+
+
+def productivity_band(score: float) -> str:
+    if score < 40:
+        return "low"
+    if score < 70:
+        return "moderate"
+    if score < 85:
+        return "high"
+    return "excellent"
+
+
+def create_productivity_outputs(
+    data: pd.DataFrame,
+    model: Pipeline,
+    output_dir: Path,
+) -> dict:
+    scoring_features = data.drop(columns=[TARGET_COLUMN] + LEAKAGE_COLUMNS)
+
+    predicted_grade = model.predict(scoring_features)
+    actual_grade = data[TARGET_COLUMN].to_numpy()
+
+    actual_score = grade_to_productivity_score(actual_grade)
+    predicted_score = grade_to_productivity_score(predicted_grade)
+
+    scored_df = pd.DataFrame(
+        {
+            "record_id": np.arange(1, len(data) + 1),
+            "subject": data["subject"].values,
+            "actual_g3": actual_grade,
+            "predicted_g3": predicted_grade,
+            "actual_productivity_score": actual_score,
+            "predicted_productivity_score": predicted_score,
+            "score_error": np.abs(actual_score - predicted_score),
+            "predicted_productivity_band": [
+                productivity_band(float(score)) for score in predicted_score
+            ],
+        }
+    )
+
+    scored_df.to_csv(output_dir / "productivity_scores.csv", index=False)
+
+    score_summary = {
+        "score_formula": "clip((grade - 0) / (20 - 0), 0, 1) * 100",
+        "score_range": [0, 100],
+        "band_thresholds": {
+            "low": "[0, 40)",
+            "moderate": "[40, 70)",
+            "high": "[70, 85)",
+            "excellent": "[85, 100]",
+        },
+        "overall": {
+            "actual_mean_score": float(np.mean(actual_score)),
+            "predicted_mean_score": float(np.mean(predicted_score)),
+            "mean_absolute_score_error": float(np.mean(np.abs(actual_score - predicted_score))),
+        },
+        "by_subject": (
+            scored_df.groupby("subject", as_index=False)
+            .agg(
+                actual_mean_score=("actual_productivity_score", "mean"),
+                predicted_mean_score=("predicted_productivity_score", "mean"),
+                mean_abs_score_error=("score_error", "mean"),
+            )
+            .to_dict(orient="records")
+        ),
+    }
+
+    with (output_dir / "productivity_score_summary.json").open(
+        "w", encoding="utf-8"
+    ) as file:
+        json.dump(score_summary, file, indent=2)
+
+    return score_summary
+
+
 def train_pipeline(project_root: Path) -> dict:
     student_dir = project_root / "student"
     output_dir = project_root / "artifacts"
@@ -225,6 +324,7 @@ def train_pipeline(project_root: Path) -> dict:
     joblib.dump(best_model, model_path)
 
     create_relationship_reports(data, output_dir)
+    productivity_summary = create_productivity_outputs(data, best_model, output_dir)
 
     metadata = {
         "target": TARGET_COLUMN,
@@ -234,6 +334,7 @@ def train_pipeline(project_root: Path) -> dict:
         "model_path": str(model_path),
         "best_params": best_search.best_params_,
         "metrics": metrics,
+        "productivity_summary": productivity_summary,
     }
 
     with (output_dir / "training_summary.json").open("w", encoding="utf-8") as file:
@@ -259,3 +360,4 @@ if __name__ == "__main__":
 
     print(f"\nModel artifact: {summary['model_path']}")
     print("Training summary: artifacts/training_summary.json")
+    print("Productivity scores: artifacts/productivity_scores.csv")
