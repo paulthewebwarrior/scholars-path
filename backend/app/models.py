@@ -10,6 +10,7 @@ from sqlalchemy import (
     LargeBinary,
     String,
     Text,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.types import TypeDecorator
@@ -33,6 +34,75 @@ class EncryptedFloat(TypeDecorator[float]):
         return decrypt_number(value)
 
 
+class Career(Base):
+    __tablename__ = 'careers'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+
+
+class SkillArea(Base):
+    __tablename__ = 'skill_areas'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    importance_level: Mapped[str] = mapped_column(String(20), nullable=False, default='moderate')
+
+
+class CareerSkill(Base):
+    __tablename__ = 'career_skills'
+    __table_args__ = (
+        UniqueConstraint('career_id', 'skill_area_id', name='uq_career_skills_career_skill'),
+        Index('ix_career_skills_career_id', 'career_id'),
+        Index('ix_career_skills_skill_area_id', 'skill_area_id'),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    career_id: Mapped[int] = mapped_column(ForeignKey('careers.id', ondelete='CASCADE'), nullable=False)
+    skill_area_id: Mapped[int] = mapped_column(ForeignKey('skill_areas.id', ondelete='CASCADE'), nullable=False)
+
+
+class Subject(Base):
+    __tablename__ = 'subjects'
+    __table_args__ = (
+        Index('ix_subjects_field_of_study', 'field_of_study'),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(120), nullable=False, index=True)
+    field_of_study: Mapped[str] = mapped_column(String(120), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+
+
+class SkillSubject(Base):
+    __tablename__ = 'skill_subjects'
+    __table_args__ = (
+        UniqueConstraint('skill_area_id', 'subject_id', name='uq_skill_subjects_skill_subject'),
+        Index('ix_skill_subjects_skill_area_id', 'skill_area_id'),
+        Index('ix_skill_subjects_subject_id', 'subject_id'),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    skill_area_id: Mapped[int] = mapped_column(ForeignKey('skill_areas.id', ondelete='CASCADE'), nullable=False)
+    subject_id: Mapped[int] = mapped_column(ForeignKey('subjects.id', ondelete='CASCADE'), nullable=False)
+    relevance_indicator: Mapped[str] = mapped_column(String(20), nullable=False, default='moderate')
+
+
+class SubjectResource(Base):
+    __tablename__ = 'subject_resources'
+    __table_args__ = (
+        Index('ix_subject_resources_subject_id', 'subject_id'),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    subject_id: Mapped[int] = mapped_column(ForeignKey('subjects.id', ondelete='CASCADE'), nullable=False)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    url: Mapped[str] = mapped_column(String(512), nullable=False)
+    provider: Mapped[str] = mapped_column(String(100), nullable=False)
+
+
 class User(Base):
     __tablename__ = 'users'
 
@@ -42,6 +112,11 @@ class User(Base):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     course: Mapped[str] = mapped_column(String(100), nullable=False)
     year_level: Mapped[str] = mapped_column(String(50), nullable=False)
+    career_id: Mapped[int | None] = mapped_column(
+        ForeignKey('careers.id', ondelete='SET NULL'),
+        nullable=True,
+        index=True,
+    )
     career_goal: Mapped[str] = mapped_column(String(255), nullable=False, default='')
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

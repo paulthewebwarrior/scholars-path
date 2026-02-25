@@ -16,7 +16,7 @@ class RegisterRequest(BaseModel):
     name: str
     course: str
     year_level: Literal['Freshman', 'Sophomore', 'Junior', 'Senior']
-    career_goal: str
+    career_goal: str = ''
 
     @field_validator('password')
     @classmethod
@@ -31,13 +31,18 @@ class RegisterRequest(BaseModel):
             raise ValueError(PASSWORD_POLICY_MESSAGE)
         return value
 
-    @field_validator('name', 'course', 'career_goal')
+    @field_validator('name', 'course')
     @classmethod
     def validate_non_empty_profile_fields(cls, value: str) -> str:
         cleaned = value.strip()
         if not cleaned:
             raise ValueError('All fields are required')
         return cleaned
+
+    @field_validator('career_goal')
+    @classmethod
+    def normalize_career_goal(cls, value: str) -> str:
+        return value.strip()
 
 
 class LoginRequest(BaseModel):
@@ -88,6 +93,14 @@ class ProfileUpdateRequest(BaseModel):
         return value.strip()
 
 
+class CareerSummaryResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    description: str
+
+
 class UserProfileResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -96,9 +109,64 @@ class UserProfileResponse(BaseModel):
     name: str
     course: str
     year_level: str
+    career_id: int | None = None
     career_goal: str
+    career: CareerSummaryResponse | None = None
     created_at: datetime
     updated_at: datetime
+
+
+class CareerSelectionRequest(BaseModel):
+    career_id: int
+
+
+class CareerResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    description: str
+
+
+class CareerSkillAreaResponse(BaseModel):
+    id: int
+    name: str
+    description: str
+    importance_level: Literal['critical', 'high', 'moderate']
+
+
+class CareerSubjectResponse(BaseModel):
+    id: int
+    name: str
+    field_of_study: str
+    description: str
+    relevance_indicator: Literal['critical', 'high', 'moderate']
+
+
+class SubjectResourceResponse(BaseModel):
+    id: int
+    title: str
+    url: str
+    provider: str
+
+
+class CareerAlignedRecommendationResponse(BaseModel):
+    subject_id: int
+    subject_name: str
+    field_of_study: str
+    description: str
+    relevance_indicator: Literal['critical', 'high', 'moderate']
+    weakness_score: float
+    baseline_weakness_score: float
+    gap_closure_percent: float
+    career_relevance_context: str
+    supporting_skills: list[str]
+    resources: list[SubjectResourceResponse]
+
+
+class CareerAlignedRecommendationsListResponse(BaseModel):
+    career: CareerResponse | None = None
+    items: list[CareerAlignedRecommendationResponse]
 
 
 class HabitsAssessmentBase(BaseModel):

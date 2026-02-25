@@ -7,11 +7,16 @@ from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from .career_services import seed_career_metadata
 from .config import get_settings
-from .database import Base, engine
+from .database import Base, SessionLocal, engine
+from .migrations import ensure_career_schema
 from .routers.auth import router as auth_router
+from .routers.career_recommendations import router as career_recommendations_router
+from .routers.careers import router as careers_router
 from .routers.habits import router as habits_router
 from .routers.profile import router as profile_router
+from .routers.resources import router as resources_router
 
 settings = get_settings()
 logger = logging.getLogger('app')
@@ -82,6 +87,9 @@ async def request_logging_middleware(request: Request, call_next):
 @app.on_event('startup')
 def on_startup() -> None:
     Base.metadata.create_all(bind=engine)
+    ensure_career_schema(engine)
+    with SessionLocal() as db:
+        seed_career_metadata(db)
     logger.info('startup db.initialized database_url=%s', settings.database_url)
     routes = sorted(
         {
@@ -101,4 +109,7 @@ def health() -> dict[str, str]:
 
 app.include_router(auth_router)
 app.include_router(profile_router)
+app.include_router(careers_router)
+app.include_router(resources_router)
+app.include_router(career_recommendations_router)
 app.include_router(habits_router)
