@@ -14,6 +14,7 @@ if str(ROOT_DIR) not in sys.path:
 from app.database import Base, get_db
 from app.main import app
 from app.rate_limiter import login_rate_limiter
+from app.career_services import seed_career_metadata
 
 
 @pytest.fixture(autouse=True)
@@ -34,6 +35,7 @@ def db_session(tmp_path: Path) -> Generator[Session, None, None]:
 
     Base.metadata.create_all(bind=engine)
     session = testing_session_local()
+    seed_career_metadata(session)
     try:
         yield session
     finally:
