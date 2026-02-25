@@ -1,6 +1,6 @@
 # Student Productivity System
 
-This repository now includes an end-to-end authentication and profile system for the `auth-profile-system` OpenSpec change.
+This repository now includes an end-to-end authentication/profile system plus the `career-goal-module`.
 
 ## Auth Features Implemented
 
@@ -11,6 +11,17 @@ This repository now includes an end-to-end authentication and profile system for
 - Protected profile endpoints (`GET /api/profile/me`, `PUT /api/profile/me`)
 - Angular login/register/profile pages and protected routes
 - HTTP interceptor for token injection and automatic refresh/retry
+
+## Career Goal Module Features Implemented
+
+- Curated career catalog with five predefined careers
+- Career → skill-area → subject mapping with seeded static data
+- Career selection onboarding page and profile career editing flow
+- Career metadata APIs (`/api/careers/*`)
+- Career-aligned recommendation API (`/api/users/{userId}/recommendations/career-aligned`)
+- Subject resource API (`/api/resources/subject/{subjectId}`)
+- Dashboard + results UI sections for career-aligned recommendations
+- Simulation sliders that refresh career alignment recommendations in near real time
 
 ## Backend Setup
 
@@ -42,14 +53,21 @@ cd backend
 python scripts/create_users_table.py
 ```
 
-4. Seed local test users (optional):
+4. Apply career module schema updates (existing SQLite databases):
+
+```bash
+cd backend
+python scripts/create_career_module_tables.py
+```
+
+5. Seed local test users (optional):
 
 ```bash
 cd backend
 python scripts/seed_test_users.py
 ```
 
-5. Run the API:
+6. Run the API:
 
 ```bash
 cd backend

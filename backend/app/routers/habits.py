@@ -10,6 +10,7 @@ from ..database import get_db
 from ..deps import get_current_user
 from ..habits_engine import RecommendationGenerator, recompute_correlations
 from ..models import HabitsAssessment, HabitsCorrelation, HabitsRecommendation, User
+from ..productivity_model import predict_productivity_score
 from ..schemas import (
     HabitsAssessmentCreate,
     HabitsAssessmentHistoryResponse,
@@ -21,6 +22,12 @@ from ..schemas import (
 
 router = APIRouter(prefix='/api/habits', tags=['habits'])
 logger = logging.getLogger(__name__)
+
+
+def _assessment_response(assessment: HabitsAssessment, user: User) -> HabitsAssessmentResponse:
+    payload = HabitsAssessmentResponse.model_validate(assessment).model_dump()
+    payload['productivity_score'] = predict_productivity_score(assessment, user)
+    return HabitsAssessmentResponse(**payload)
 
 
 def _validate_user_access(user_id: int, current_user: User) -> None:
@@ -77,7 +84,7 @@ def submit_assessment(
         len(recommendations),
     )
 
-    return HabitsAssessmentResponse.model_validate(assessment)
+    return _assessment_response(assessment, current_user)
 
 
 @router.get('/{user_id}/latest', response_model=HabitsAssessmentResponse)
@@ -98,7 +105,7 @@ def get_latest_assessment(
         logger.info('habits.assessment.latest.empty user_id=%s', user_id)
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='No assessments found')
     logger.info('habits.assessment.latest.success user_id=%s assessment_id=%s', user_id, assessment.assessment_id)
-    return HabitsAssessmentResponse.model_validate(assessment)
+    return _assessment_response(assessment, current_user)
 
 
 @router.get('/{user_id}/history', response_model=HabitsAssessmentHistoryResponse)
@@ -134,7 +141,7 @@ def get_assessment_history(
         ).all()
     )
     return HabitsAssessmentHistoryResponse(
-        items=[HabitsAssessmentResponse.model_validate(item) for item in items],
+        items=[_assessment_response(item, current_user) for item in items],
         page=page,
         page_size=page_size,
         total=total,

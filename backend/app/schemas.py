@@ -229,6 +229,7 @@ class HabitsAssessmentResponse(HabitsAssessmentBase):
 
     assessment_id: int
     user_id: int
+    productivity_score: float | None = None
     created_at: datetime
     updated_at: datetime
 

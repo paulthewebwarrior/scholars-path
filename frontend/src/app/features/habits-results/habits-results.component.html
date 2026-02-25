@@ -35,6 +35,25 @@
 
   @if (!loading() && latestAssessment()) {
 
+    <article class="px-panel results-panel results-delay-1">
+      <h2 class="px-panel__title"><i class="fa-solid fa-gauge-high"></i> Productivity Score</h2>
+      @if (productivityScore() !== null) {
+        <div class="metric-card"
+             [class.metric-card--good]="productivityTierClass() === 'good'"
+             [class.metric-card--warn]="productivityTierClass() === 'warn'"
+             [class.metric-card--bad]="productivityTierClass() === 'bad'">
+          <div class="metric-card__icon"><i class="fa-solid fa-bolt"></i></div>
+          <div class="metric-card__body">
+            <p class="metric-card__label">Predicted Productivity</p>
+            <p class="metric-card__value">{{ productivityScore()!.toFixed(2) }}<span class="metric-card__unit"> / 100</span></p>
+          </div>
+          <div class="metric-card__status-dot"></div>
+        </div>
+      } @else {
+        <p class="empty-state">Productivity model is unavailable right now.</p>
+      }
+    </article>
+
     <!-- ── Stat metrics grid ── -->
     <section class="results-section">
       <h2 class="section-heading"><i class="fa-solid fa-list-check"></i> Submitted Metrics</h2>

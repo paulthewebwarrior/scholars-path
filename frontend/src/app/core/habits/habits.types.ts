@@ -18,6 +18,7 @@ export interface HabitsAssessmentPayload {
 export interface HabitsAssessment extends HabitsAssessmentPayload {
   assessment_id: number;
   user_id: number;
+  productivity_score: number | null;
   created_at: string;
   updated_at: string;
 }

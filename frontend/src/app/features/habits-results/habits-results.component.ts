@@ -128,6 +128,18 @@ export class HabitsResultsComponent {
     return metric.replaceAll('_', ' ');
   }
 
+  protected productivityScore(): number | null {
+    return this.latestAssessment()?.productivity_score ?? null;
+  }
+
+  protected productivityTierClass(): 'good' | 'warn' | 'bad' {
+    const score = this.productivityScore();
+    if (score === null) return 'warn';
+    if (score >= 70) return 'good';
+    if (score >= 50) return 'warn';
+    return 'bad';
+  }
+
   protected weaknessPercent(score: number): number {
     return Math.round(score * 100);
   }
