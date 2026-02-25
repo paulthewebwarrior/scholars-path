@@ -47,9 +47,6 @@
         }
       </select>
 
-      <label for="career-goal">Career Goal</label>
-      <input id="career-goal" type="text" formControlName="career_goal" placeholder="e.g. Software Engineer" />
-
       @if (serverError()) {
         <p class="auth-error">{{ serverError() }}</p>
       }

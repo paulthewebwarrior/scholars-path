@@ -51,8 +51,8 @@ export class LoginComponent {
         finalize(() => this.loading.set(false)),
       )
       .subscribe({
-        next: () => {
-          void this.router.navigate(['/dashboard']);
+        next: (profile) => {
+          void this.router.navigate([profile.career_id ? '/dashboard' : '/onboarding/career']);
         },
         error: () => {
           this.errorMessage.set('Invalid email or password');

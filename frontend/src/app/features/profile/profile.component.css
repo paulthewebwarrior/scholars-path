@@ -1,2 +1,17 @@
-/* Profile-specific overrides – base styles come from pixel-ui.css */
+.career-edit-panel {
+  margin-top: 1rem;
+}
 
+.career-edit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.career-edit-form {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 420px;
+}

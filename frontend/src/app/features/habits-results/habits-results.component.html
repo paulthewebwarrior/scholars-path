@@ -154,6 +154,77 @@
       }
     </article>
 
+    <!-- ── Career-Aligned Recommendations ── -->
+    <article class="px-panel results-panel results-delay-2">
+      <h2 class="px-panel__title"><i class="fa-solid fa-compass"></i> Improve Skills for {{ selectedCareerName() || 'Your Career' }}</h2>
+
+      @if (careerRecommendationsError()) {
+        <p class="px-msg px-msg--error">{{ careerRecommendationsError() }}</p>
+      }
+
+      @if (careerRecommendationsLoading()) {
+        <p class="empty-state">Refreshing career-aligned recommendations...</p>
+      } @else if (careerRecommendations().length === 0) {
+        <p class="empty-state">No career-aligned recommendations yet. Set a career goal and submit an assessment.</p>
+      } @else {
+        <ul class="career-list">
+          @for (item of careerRecommendations(); track item.subject_id) {
+            <li class="career-item">
+              <div class="career-item__head">
+                <h3>{{ item.subject_name }}</h3>
+                <span class="career-item__weakness">{{ weaknessPercent(item.weakness_score) }}% weak</span>
+              </div>
+              <p class="career-item__context">{{ item.career_relevance_context }}</p>
+              <p class="career-item__skills">Skills: {{ item.supporting_skills.join(', ') }}</p>
+              <div class="career-item__resources">
+                @for (resource of item.resources; track resource.id) {
+                  <a [href]="resource.url" target="_blank" rel="noopener noreferrer">
+                    {{ resource.provider }} · {{ resource.title }}
+                  </a>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </article>
+
+    <!-- ── Simulation Panel ── -->
+    <article class="px-panel results-panel results-delay-3">
+      <h2 class="px-panel__title"><i class="fa-solid fa-sliders"></i> Simulation Mode</h2>
+      <p class="px-page-subtitle">Adjust habits and see career alignment update in real time.</p>
+
+      <form [formGroup]="simulationForm" class="simulation-form">
+        <label for="sim-study">Study hours/day: {{ simulationForm.controls.study_hours.value }}</label>
+        <input id="sim-study" type="range" min="0" max="12" step="0.5" formControlName="study_hours" />
+
+        <label for="sim-focus">Focus score: {{ simulationForm.controls.focus_score.value }}</label>
+        <input id="sim-focus" type="range" min="0" max="100" step="1" formControlName="focus_score" />
+
+        <label for="sim-phone">Phone usage/day: {{ simulationForm.controls.phone_usage_hours.value }}</label>
+        <input id="sim-phone" type="range" min="0" max="12" step="0.5" formControlName="phone_usage_hours" />
+
+        <label for="sim-social">Social media/day: {{ simulationForm.controls.social_media_hours.value }}</label>
+        <input id="sim-social" type="range" min="0" max="10" step="0.5" formControlName="social_media_hours" />
+
+        <label for="sim-sleep">Sleep hours/day: {{ simulationForm.controls.sleep_hours.value }}</label>
+        <input id="sim-sleep" type="range" min="0" max="12" step="0.5" formControlName="sleep_hours" />
+
+        <label for="sim-assignments">Assignments/week: {{ simulationForm.controls.assignments_completed_per_week.value }}</label>
+        <input id="sim-assignments" type="range" min="0" max="20" step="1" formControlName="assignments_completed_per_week" />
+      </form>
+
+      @if (simulationImpactMessage()) {
+        <p class="sim-impact">{{ simulationImpactMessage() }}</p>
+      }
+
+      <div class="actions">
+        <button type="button" class="px-btn px-btn--secondary" (click)="resetSimulation()">
+          <i class="fa-solid fa-rotate-left"></i> Reset Simulation
+        </button>
+      </div>
+    </article>
+
     <!-- ── Previous vs Current ── -->
     @if (previousAssessment()) {
       <article class="px-panel results-panel results-delay-3">

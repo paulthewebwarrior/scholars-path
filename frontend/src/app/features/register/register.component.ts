@@ -38,7 +38,6 @@ export class RegisterComponent {
     name: ['', [Validators.required, Validators.maxLength(100)]],
     course: ['', [Validators.required]],
     year_level: ['Freshman' as (typeof YEAR_LEVELS)[number], [Validators.required]],
-    career_goal: ['', [Validators.required]],
   });
 
   protected readonly passwordStrength = computed(() => {
@@ -69,7 +68,10 @@ export class RegisterComponent {
     this.loading.set(true);
     this.serverError.set('');
 
-    const payload = this.registerForm.getRawValue() as RegisterPayload;
+    const payload = {
+      ...this.registerForm.getRawValue(),
+      career_goal: '',
+    } as RegisterPayload;
     this.auth
       .register(payload)
       .pipe(finalize(() => this.loading.set(false)))

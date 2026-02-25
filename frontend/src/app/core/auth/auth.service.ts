@@ -5,6 +5,7 @@ import { Observable, map, of, tap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import {
+  CareerSelectionPayload,
   LoginPayload,
   LogoutResponse,
   ProfileUpdatePayload,
@@ -72,6 +73,18 @@ export class AuthService {
   updateProfile(payload: ProfileUpdatePayload): Observable<UserProfile> {
     return this.http
       .put<UserProfile>(`${this.apiBaseUrl}/profile/me`, payload)
+      .pipe(tap((profile) => this.userProfile.set(profile)));
+  }
+
+  setCareer(payload: CareerSelectionPayload): Observable<UserProfile> {
+    return this.http
+      .post<UserProfile>(`${this.apiBaseUrl}/profile/career`, payload)
+      .pipe(tap((profile) => this.userProfile.set(profile)));
+  }
+
+  updateCareer(payload: CareerSelectionPayload): Observable<UserProfile> {
+    return this.http
+      .put<UserProfile>(`${this.apiBaseUrl}/profile/career`, payload)
       .pipe(tap((profile) => this.userProfile.set(profile)));
   }
 

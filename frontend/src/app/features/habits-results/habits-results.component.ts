@@ -1,10 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { forkJoin, of } from 'rxjs';
-import { catchError, finalize, map, switchMap } from 'rxjs/operators';
+import { catchError, debounceTime, finalize, map, switchMap } from 'rxjs/operators';
 
 import { AuthService } from '../../core/auth/auth.service';
+import { CareersService } from '../../core/careers/careers.service';
+import { CareerAlignedRecommendation } from '../../core/careers/careers.types';
 import { HabitsService } from '../../core/habits/habits.service';
 import {
   HabitsAssessment,
@@ -40,15 +43,17 @@ const METRIC_CONFIG: MetricConfig[] = [
 @Component({
   selector: 'app-habits-results',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './habits-results.component.html',
   styleUrl: './habits-results.component.css',
 })
 export class HabitsResultsComponent {
   private readonly auth = inject(AuthService);
   private readonly habitsService = inject(HabitsService);
+  private readonly careersService = inject(CareersService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
 
   protected readonly loading = signal(true);
   protected readonly errorMessage = signal('');
@@ -59,10 +64,32 @@ export class HabitsResultsComponent {
   protected readonly expandedRecommendationIds = signal<Set<number>>(new Set<number>());
   protected readonly leaving = signal(false);
 
+  protected readonly careerRecommendationsLoading = signal(false);
+  protected readonly careerRecommendationsError = signal('');
+  protected readonly careerRecommendations = signal<CareerAlignedRecommendation[]>([]);
+  protected readonly selectedCareerName = signal('');
+  protected readonly simulationImpactMessage = signal('');
+
+  protected readonly simulationForm = this.fb.nonNullable.group({
+    study_hours: [2],
+    focus_score: [60],
+    phone_usage_hours: [2],
+    social_media_hours: [1],
+    sleep_hours: [7],
+    assignments_completed_per_week: [5],
+  });
+
   protected readonly metricConfig = METRIC_CONFIG;
 
   constructor() {
     this.loadResults();
+
+    this.simulationForm.valueChanges.pipe(debounceTime(280)).subscribe(() => {
+      if (!this.latestAssessment() || this.loading()) {
+        return;
+      }
+      this.refreshCareerRecommendations(true);
+    });
   }
 
   protected metricClass(key: keyof HabitsAssessment, value: number | null | undefined): 'good' | 'warn' | 'bad' {
@@ -99,6 +126,30 @@ export class HabitsResultsComponent {
 
   protected formatMetricName(metric: string): string {
     return metric.replaceAll('_', ' ');
+  }
+
+  protected weaknessPercent(score: number): number {
+    return Math.round(score * 100);
+  }
+
+  protected resetSimulation(): void {
+    const latest = this.latestAssessment();
+    if (!latest) {
+      return;
+    }
+
+    this.simulationForm.patchValue(
+      {
+        study_hours: latest.study_hours,
+        focus_score: latest.focus_score,
+        phone_usage_hours: latest.phone_usage_hours,
+        social_media_hours: latest.social_media_hours,
+        sleep_hours: latest.sleep_hours,
+        assignments_completed_per_week: latest.assignments_completed_per_week,
+      },
+      { emitEvent: false },
+    );
+    this.refreshCareerRecommendations(false);
   }
 
   protected toggleWhy(recommendationId: number): void {
@@ -160,9 +211,75 @@ export class HabitsResultsComponent {
             correlations.sort((a, b) => Math.abs(b.correlation_coefficient) - Math.abs(a.correlation_coefficient)).slice(0, 5),
           );
           this.recommendations.set(recommendations.slice(0, 5));
+
+          this.simulationForm.patchValue(
+            {
+              study_hours: latest.study_hours,
+              focus_score: latest.focus_score,
+              phone_usage_hours: latest.phone_usage_hours,
+              social_media_hours: latest.social_media_hours,
+              sleep_hours: latest.sleep_hours,
+              assignments_completed_per_week: latest.assignments_completed_per_week,
+            },
+            { emitEvent: false },
+          );
+
+          this.refreshCareerRecommendations(false);
         },
         error: () => {
           this.errorMessage.set('Unable to load results right now. Please try again.');
+        },
+      });
+  }
+
+  private refreshCareerRecommendations(useSimulation: boolean): void {
+    const user = this.auth.user();
+    if (!user || !user.career_id) {
+      this.careerRecommendations.set([]);
+      this.selectedCareerName.set('');
+      this.simulationImpactMessage.set('');
+      return;
+    }
+
+    const query = useSimulation
+      ? {
+          ...this.simulationForm.getRawValue(),
+          limit: 3,
+        }
+      : { limit: 3 };
+
+    this.careerRecommendationsLoading.set(true);
+    this.careerRecommendationsError.set('');
+
+    this.careersService
+      .getCareerAlignedRecommendations(user.id, query)
+      .pipe(finalize(() => this.careerRecommendationsLoading.set(false)))
+      .subscribe({
+        next: (response) => {
+          this.selectedCareerName.set(response.career?.name ?? user.career?.name ?? user.career_goal);
+          this.careerRecommendations.set(response.items.slice(0, 3));
+
+          if (!useSimulation || response.items.length === 0) {
+            this.simulationImpactMessage.set('');
+            return;
+          }
+
+          const strongest = response.items
+            .slice()
+            .sort((a, b) => b.gap_closure_percent - a.gap_closure_percent)[0];
+
+          if (strongest && strongest.gap_closure_percent > 0) {
+            this.simulationImpactMessage.set(
+              `Simulation closes ${strongest.gap_closure_percent.toFixed(1)}% of ${strongest.subject_name} gap.`,
+            );
+          } else {
+            this.simulationImpactMessage.set(
+              'Simulation changed inputs, but no immediate career-gap closure was detected.',
+            );
+          }
+        },
+        error: () => {
+          this.careerRecommendationsError.set('Unable to load career-aligned recommendations.');
         },
       });
   }

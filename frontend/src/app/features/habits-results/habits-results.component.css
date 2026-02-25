@@ -514,3 +514,86 @@
   transform: translate(2px, 2px);
 }
 
+
+/* ---------- career-aligned recommendations ---------- */
+.career-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.career-item {
+  border: 2px solid #000;
+  background: #fff;
+  box-shadow: 4px 4px 0 #000;
+  padding: 0.9rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.career-item__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.career-item__head h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.career-item__weakness {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  background: #111;
+  color: #fff;
+  padding: 0.28rem 0.4rem;
+}
+
+.career-item__context,
+.career-item__skills {
+  margin: 0;
+}
+
+.career-item__resources {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.career-item__resources a {
+  color: #003d99;
+  text-decoration: none;
+}
+
+.career-item__resources a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- simulation panel ---------- */
+.simulation-form {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.simulation-form label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  line-height: 1.6;
+}
+
+.simulation-form input[type='range'] {
+  width: 100%;
+}
+
+.sim-impact {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.56rem;
+  line-height: 1.8;
+  border: 2px solid #006622;
+  padding: 0.5rem;
+  background: #f2fff5;
+}
