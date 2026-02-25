@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+import { getApiBaseUrl } from '../api/api-url';
 import {
   HabitsAssessment,
   HabitsAssessmentHistory,
@@ -15,7 +16,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class HabitsService {
   private readonly http = inject(HttpClient);
-  private readonly apiBaseUrl = '/api/habits';
+  private readonly apiBaseUrl = `${getApiBaseUrl()}/habits`;
 
   submitAssessment(userId: number, payload: HabitsAssessmentPayload): Observable<HabitsAssessment> {
     return this.http.post<HabitsAssessment>(`${this.apiBaseUrl}/${userId}/assessment`, payload);

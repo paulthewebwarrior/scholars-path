@@ -68,10 +68,7 @@ export class RegisterComponent {
     this.loading.set(true);
     this.serverError.set('');
 
-    const payload = {
-      ...this.registerForm.getRawValue(),
-      career_goal: '',
-    } as RegisterPayload;
+    const payload = this.registerForm.getRawValue() as RegisterPayload;
     this.auth
       .register(payload)
       .pipe(finalize(() => this.loading.set(false)))

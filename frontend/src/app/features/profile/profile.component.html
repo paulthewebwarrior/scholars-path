@@ -31,7 +31,7 @@
         <div class="px-data-row"><dt>Email</dt><dd>{{ auth.user()?.email }}</dd></div>
         <div class="px-data-row"><dt>Course</dt><dd>{{ auth.user()?.course }}</dd></div>
         <div class="px-data-row"><dt>Year Level</dt><dd>{{ auth.user()?.year_level }}</dd></div>
-        <div class="px-data-row"><dt>Selected Career</dt><dd>{{ auth.user()?.career?.name || auth.user()?.career_goal || 'Not set' }}</dd></div>
+        <div class="px-data-row"><dt>Selected Career</dt><dd>{{ auth.user()?.career?.name || 'Not set' }}</dd></div>
       </dl>
     } @else {
       <form [formGroup]="profileForm" (ngSubmit)="save()" class="px-profile-form">
@@ -48,9 +48,6 @@
           }
         </select>
 
-        <label for="career-goal">Career Goal Notes</label>
-        <textarea id="career-goal" formControlName="career_goal" rows="3" placeholder="Optional notes about your goal"></textarea>
-
         <button type="submit" class="px-btn" [disabled]="profileForm.invalid || saving()">
           @if (!saving()) { <i class="fa-solid fa-floppy-disk"></i> } @else { <i class="fa-solid fa-spinner fa-spin"></i> }
           {{ saving() ? 'Saving...' : 'Save Changes' }}
@@ -62,7 +59,9 @@
       <div class="career-edit-header">
         <h2 class="px-panel__title"><i class="fa-solid fa-compass"></i> Career Selection</h2>
         @if (!careerEditing()) {
-          <button type="button" class="px-btn px-btn--secondary" (click)="startCareerEdit()">Edit Career</button>
+          <button type="button" class="px-btn px-btn--secondary" (click)="startCareerEdit()">
+            @if (auth.user()?.career_id) { Edit Career } @else { Choose Career }
+          </button>
         } @else {
           <button type="button" class="px-btn" (click)="cancelCareerEdit()">Cancel</button>
         }

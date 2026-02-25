@@ -9,20 +9,17 @@ import { inject } from '@angular/core';
 import { throwError } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 
+import { isApiUrl, isAuthApiUrl } from '../api/api-url';
 import { AuthService } from './auth.service';
 
 const SHOULD_RETRY_ONCE = new HttpContextToken<boolean>(() => true);
 
 function isApiRequest(url: string): boolean {
-  return url.startsWith('/api');
+  return isApiUrl(url);
 }
 
 function isAuthEndpoint(url: string): boolean {
-  return (
-    url.startsWith('/api/auth/login')
-    || url.startsWith('/api/auth/register')
-    || url.startsWith('/api/auth/refresh')
-  );
+  return isAuthApiUrl(url);
 }
 
 function addBearerToken(request: HttpRequest<unknown>, token: string): HttpRequest<unknown> {

@@ -38,7 +38,6 @@ export class ProfileComponent {
     name: ['', [Validators.required, Validators.maxLength(100)]],
     course: ['', [Validators.required]],
     year_level: ['Freshman' as (typeof YEAR_LEVELS)[number], [Validators.required]],
-    career_goal: [''],
   });
 
   protected readonly careerForm = this.fb.nonNullable.group({
@@ -134,9 +133,8 @@ export class ProfileComponent {
       .updateCareer(this.careerForm.getRawValue())
       .pipe(finalize(() => this.careerSaving.set(false)))
       .subscribe({
-        next: (profile) => {
+        next: () => {
           this.careerEditing.set(false);
-          this.profileForm.patchValue({ career_goal: profile.career?.name ?? profile.career_goal });
           this.successMessage.set('Career updated successfully.');
         },
         error: () => {
@@ -168,7 +166,6 @@ export class ProfileComponent {
       name: profile.name,
       course: profile.course,
       year_level: profile.year_level,
-      career_goal: profile.career?.name ?? profile.career_goal,
     });
     this.careerForm.patchValue({ career_id: profile.career_id ?? 0 });
   }

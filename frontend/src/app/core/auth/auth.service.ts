@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map, of, tap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
+import { getApiBaseUrl } from '../api/api-url';
 import {
   CareerSelectionPayload,
   LoginPayload,
@@ -20,7 +21,7 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
 
-  private readonly apiBaseUrl = '/api';
+  private readonly apiBaseUrl = getApiBaseUrl();
   private readonly accessToken = signal<string | null>(null);
   private readonly userProfile = signal<UserProfile | null>(null);
 

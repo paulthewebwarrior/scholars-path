@@ -54,7 +54,7 @@ export class DashboardComponent {
       return;
     }
 
-    this.selectedCareerName.set(profile.career?.name ?? profile.career_goal);
+    this.selectedCareerName.set(profile.career?.name ?? '');
     this.recommendationsLoading.set(true);
     this.recommendationsError.set('');
 
@@ -63,7 +63,7 @@ export class DashboardComponent {
       .pipe(finalize(() => this.recommendationsLoading.set(false)))
       .subscribe({
         next: (response) => {
-          this.selectedCareerName.set(response.career?.name ?? profile.career_goal);
+          this.selectedCareerName.set(response.career?.name ?? '');
           this.careerRecommendations.set(response.items.slice(0, 3));
         },
         error: () => {

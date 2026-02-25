@@ -256,7 +256,7 @@ export class HabitsResultsComponent {
       .pipe(finalize(() => this.careerRecommendationsLoading.set(false)))
       .subscribe({
         next: (response) => {
-          this.selectedCareerName.set(response.career?.name ?? user.career?.name ?? user.career_goal);
+          this.selectedCareerName.set(response.career?.name ?? user.career?.name ?? '');
           this.careerRecommendations.set(response.items.slice(0, 3));
 
           if (!useSimulation || response.items.length === 0) {

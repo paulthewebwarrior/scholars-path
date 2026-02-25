@@ -6,7 +6,6 @@ export interface RegisterPayload {
   name: string;
   course: string;
   year_level: 'Freshman' | 'Sophomore' | 'Junior' | 'Senior';
-  career_goal?: string;
 }
 
 export interface LoginPayload {
@@ -34,7 +33,6 @@ export interface UserProfile {
   course: string;
   year_level: 'Freshman' | 'Sophomore' | 'Junior' | 'Senior';
   career_id: number | null;
-  career_goal: string;
   career: Career | null;
   created_at: string;
   updated_at: string;
@@ -44,7 +42,6 @@ export interface ProfileUpdatePayload {
   name: string;
   course: string;
   year_level: 'Freshman' | 'Sophomore' | 'Junior' | 'Senior';
-  career_goal: string;
 }
 
 export interface CareerSelectionPayload {
