@@ -3,3 +3,5 @@
 artifacts
 *.zip
 uv.lock
+.codex
+.agent
