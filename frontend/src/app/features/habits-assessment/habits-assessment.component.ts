@@ -18,6 +18,43 @@ const METRIC_FIELDS = [
   'assignments_completed_per_week', 'final_grade',
 ] as const;
 
+export interface ScaleQuestion {
+  field: string;
+  text: string;
+  type: 'scale';
+  /** Actual metric values corresponding to ratings 1–5 */
+  values: [number, number, number, number, number];
+  reverseScale?: boolean; /** true when lower rating = more of the metric (e.g. stress/coffee) */
+}
+export interface NumberQuestion  { field: string; text: string; type: 'number'; min: number; max: number; step: number; unit: string; optional?: boolean; }
+export interface CheckboxQuestion { field: string; text: string; type: 'checkbox'; }
+export type Question = ScaleQuestion | NumberQuestion | CheckboxQuestion;
+
+const STEP_QUESTIONS: Record<number, Question[]> = {
+  1: [
+    { field: 'study_hours',                    type: 'scale',   text: 'I dedicate enough time to studying each day.',          values: [0, 1.5, 3.5, 5.5, 8]   },
+    { field: 'breaks_per_day',                 type: 'scale',   text: 'I take regular breaks to stay refreshed while studying.', values: [0, 1, 3, 5, 8]         },
+    { field: 'assignments_completed_per_week', type: 'scale',   text: 'I consistently complete my assignments each week.',      values: [0, 2, 5, 8, 12]         },
+    { field: 'focus_score',                    type: 'scale',   text: 'I maintain strong focus throughout my study sessions.',  values: [10, 30, 55, 75, 95]     },
+  ],
+  2: [
+    { field: 'sleep_hours',      type: 'scale', text: 'I get enough sleep to feel rested each morning.',           values: [4, 5, 6.5, 7.5, 9]      },
+    { field: 'exercise_minutes', type: 'scale', text: 'I maintain a consistent exercise routine.',                 values: [0, 10, 30, 60, 120]     },
+    { field: 'coffee_intake',    type: 'scale', text: 'I rely on coffee or caffeine to get through the day.',      values: [0, 1, 2, 3, 5],  reverseScale: true },
+    { field: 'stress_level',     type: 'scale', text: 'I feel overwhelmed by my academic workload.',               values: [1, 3, 5, 7, 10], reverseScale: true },
+  ],
+  3: [
+    { field: 'phone_usage_hours',  type: 'scale', text: 'I use my phone frequently throughout the day.',          values: [0, 1, 2.5, 4, 6],   reverseScale: true },
+    { field: 'social_media_hours', type: 'scale', text: 'Social media takes up a large portion of my daily time.',values: [0, 0.5, 1, 2, 4],   reverseScale: true },
+    { field: 'gaming_hours',       type: 'scale', text: 'I spend significant time gaming each day.',              values: [0, 0.5, 1, 2, 4],   reverseScale: true },
+  ],
+  4: [
+    { field: 'attendance_percentage', type: 'scale',    text: 'I attend most of my classes and lectures.',         values: [50, 65, 75, 85, 95] },
+    { field: 'final_grade',           type: 'number',   text: 'Final grade (optional)',  min: 0, max: 100, step: 0.1, unit: 'pts', optional: true },
+    { field: 'grade_opt_in',          type: 'checkbox', text: 'I consent to use my grade data for analytics and recommendations.' },
+  ],
+};
+
 @Component({
   selector: 'app-habits-assessment',
   standalone: true,
@@ -42,22 +79,27 @@ export class HabitsAssessmentComponent {
   protected readonly TOTAL_STEPS = 4;
   protected readonly currentStep = signal(1);
   protected readonly stepDots = Array.from({ length: 4 }, (_, i) => i);
-
-  private readonly stepFields: Record<number, string[]> = {
-    1: ['study_hours', 'breaks_per_day', 'assignments_completed_per_week', 'focus_score'],
-    2: ['sleep_hours', 'exercise_minutes', 'coffee_intake', 'stress_level'],
-    3: ['phone_usage_hours', 'social_media_hours', 'gaming_hours'],
-    4: ['attendance_percentage', 'final_grade', 'grade_opt_in'],
-  };
+  protected readonly SCALE_NUMS = [1, 2, 3, 4, 5] as const;
+  protected readonly STEP_QUESTIONS = STEP_QUESTIONS;
 
   protected readonly STEP_LABELS: Record<number, string> = {
-    1: 'Study Patterns',
+    1: 'Study Habits',
     2: 'Lifestyle',
-    3: 'Digital Usage',
-    4: 'Performance',
+    3: 'Digital Life',
+    4: 'Grades & Attendance',
+  };
+
+  protected readonly STEP_SUBTITLES: Record<number, string> = {
+    1: 'Rate your current study routines to unlock insights.',
+    2: 'Tell us about your daily health and wellness habits.',
+    3: 'How much does technology compete with your focus?',
+    4: 'Share your academic performance to personalize results.',
   };
 
   protected readonly progressSegments = Array.from({ length: METRIC_FIELDS.length }, (_, i) => i);
+
+  /** 1–5 display rating per field; actual metric value is stored on habitsForm */
+  protected ratings: Record<string, number | null> = {};
 
   private lastSubmissionPayload: HabitsAssessmentPayload | null = null;
 
@@ -119,8 +161,33 @@ export class HabitsAssessmentComponent {
     return 'low';
   }
 
+  protected getRating(field: string): number | null {
+    return this.ratings[field] ?? null;
+  }
+
+  protected selectRating(field: string, rating: number): void {
+    this.ratings[field] = rating;
+    const q = Object.values(STEP_QUESTIONS).flat().find(x => x.field === field);
+    if (q?.type === 'scale') {
+      const value = q.values[rating - 1];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ctrl = (this.habitsForm.controls as any)[field];
+      ctrl?.setValue(value);
+    }
+  }
+
+  private ratingFromValue(q: ScaleQuestion, value: number): number {
+    let best = 0;
+    let bestDist = Infinity;
+    q.values.forEach((v, i) => {
+      const d = Math.abs(v - value);
+      if (d < bestDist) { bestDist = d; best = i + 1; }
+    });
+    return best;
+  }
+
   protected nextStep(): void {
-    const fields = this.stepFields[this.currentStep()];
+    const fields = STEP_QUESTIONS[this.currentStep()].map(q => q.field);
     fields.forEach(f => {
       const ctrl = this.habitsForm.controls[f as keyof typeof this.habitsForm.controls];
       ctrl?.markAsTouched();
@@ -236,6 +303,16 @@ export class HabitsAssessmentComponent {
     try {
       const parsed = JSON.parse(draftRaw) as Partial<HabitsAssessmentPayload>;
       this.habitsForm.patchValue(parsed);
+      // Restore display ratings from saved numeric values
+      Object.values(STEP_QUESTIONS).flat().forEach(q => {
+        if (q.type === 'scale') {
+          const ctrl = this.habitsForm.controls[q.field as keyof typeof this.habitsForm.controls];
+          const val = ctrl?.value as number | null;
+          if (val !== null && val !== undefined) {
+            this.ratings[q.field] = this.ratingFromValue(q, val);
+          }
+        }
+      });
       const draftTime = localStorage.getItem(DRAFT_TIME_KEY);
       this.draftStatus.set(
         draftTime

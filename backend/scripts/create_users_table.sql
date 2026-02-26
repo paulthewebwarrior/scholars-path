@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     course VARCHAR(100) NOT NULL,
     year_level VARCHAR(50) NOT NULL,
     career_id INTEGER NULL,
-    career_goal VARCHAR(255) NOT NULL DEFAULT '',
+    age INT(3),
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL
 );

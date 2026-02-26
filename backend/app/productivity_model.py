@@ -17,8 +17,8 @@ DEFAULT_GENDER = 'Other'
 COFFEE_MG_PER_CUP = 95.0
 
 YEAR_LEVEL_TO_AGE = {
-    'freshman': 18,
-    'first year': 18,
+    'freshman': 19,
+    'first year': 19,
     'sophomore': 19,
     'second year': 19,
     'junior': 20,
