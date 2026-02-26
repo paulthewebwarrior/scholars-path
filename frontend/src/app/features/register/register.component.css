@@ -1,0 +1,6 @@
+/* Register extends the shared auth card to be slightly wider */
+/* All base styles live in auth.shared.css */
+
+.register-card {
+  max-width: 520px;
+}

@@ -1,0 +1,94 @@
+<section class="px-page">
+  <div class="px-section-header">
+    <div>
+      <h1 class="px-page-title"><i class="fa-solid fa-id-card"></i> My Profile</h1>
+      <p class="px-page-subtitle">Manage your details for personalized recommendations.</p>
+    </div>
+
+    <div class="px-action-row">
+      @if (!editing()) {
+        <button type="button" class="px-btn px-btn--secondary" (click)="startEdit()"><i class="fa-solid fa-pen"></i> Edit Profile</button>
+      } @else {
+        <button type="button" class="px-btn" (click)="cancelEdit()"><i class="fa-solid fa-xmark"></i> Cancel</button>
+      }
+      <button type="button" class="px-btn px-btn--danger" (click)="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <p class="px-page-subtitle">Loading profile...</p>
+  } @else {
+    @if (successMessage()) {
+      <p class="px-msg px-msg--success">{{ successMessage() }}</p>
+    }
+    @if (errorMessage()) {
+      <p class="px-msg px-msg--error">{{ errorMessage() }}</p>
+    }
+
+    @if (!editing()) {
+      <dl class="px-data-list">
+        <div class="px-data-row"><dt>Name</dt><dd>{{ auth.user()?.name }}</dd></div>
+        <div class="px-data-row"><dt>Email</dt><dd>{{ auth.user()?.email }}</dd></div>
+        <div class="px-data-row"><dt>Course</dt><dd>{{ auth.user()?.course }}</dd></div>
+        <div class="px-data-row"><dt>Year Level</dt><dd>{{ auth.user()?.year_level }}</dd></div>
+        <div class="px-data-row"><dt>Selected Career</dt><dd>{{ auth.user()?.career?.name || 'Not set' }}</dd></div>
+      </dl>
+    } @else {
+      <form [formGroup]="profileForm" (ngSubmit)="save()" class="px-profile-form">
+        <label for="name">Name</label>
+        <input id="name" type="text" formControlName="name" placeholder="Your full name" />
+
+        <label for="course">Course</label>
+        <input id="course" type="text" formControlName="course" placeholder="e.g. Computer Science" />
+
+        <label for="year-level">Year Level</label>
+        <select id="year-level" formControlName="year_level">
+          @for (year of yearLevels; track year) {
+            <option [value]="year">{{ year }}</option>
+          }
+        </select>
+
+        <button type="submit" class="px-btn" [disabled]="profileForm.invalid || saving()">
+          @if (!saving()) { <i class="fa-solid fa-floppy-disk"></i> } @else { <i class="fa-solid fa-spinner fa-spin"></i> }
+          {{ saving() ? 'Saving...' : 'Save Changes' }}
+        </button>
+      </form>
+    }
+
+    <article class="px-panel career-edit-panel">
+      <div class="career-edit-header">
+        <h2 class="px-panel__title"><i class="fa-solid fa-compass"></i> Career Selection</h2>
+        @if (!careerEditing()) {
+          <button type="button" class="px-btn px-btn--secondary" (click)="startCareerEdit()">
+            @if (auth.user()?.career_id) { Edit Career } @else { Choose Career }
+          </button>
+        } @else {
+          <button type="button" class="px-btn" (click)="cancelCareerEdit()">Cancel</button>
+        }
+      </div>
+
+      <p class="px-page-subtitle">Current: {{ auth.user()?.career?.name || 'Not set' }}</p>
+
+      @if (careerErrorMessage()) {
+        <p class="px-msg px-msg--error">{{ careerErrorMessage() }}</p>
+      }
+
+      @if (careerEditing()) {
+        <form [formGroup]="careerForm" (ngSubmit)="saveCareer()" class="career-edit-form">
+          <label for="career-select">Select Career</label>
+          <select id="career-select" formControlName="career_id">
+            <option [ngValue]="0">Select one...</option>
+            @for (career of careerOptions(); track career.id) {
+              <option [ngValue]="career.id">{{ career.name }}</option>
+            }
+          </select>
+
+          <button type="submit" class="px-btn" [disabled]="careerSaving()">
+            @if (!careerSaving()) { <i class="fa-solid fa-floppy-disk"></i> } @else { <i class="fa-solid fa-spinner fa-spin"></i> }
+            {{ careerSaving() ? 'Saving...' : 'Update Career' }}
+          </button>
+        </form>
+      }
+    </article>
+  }
+</section>

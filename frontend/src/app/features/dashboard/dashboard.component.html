@@ -1,0 +1,80 @@
+<section class="px-page">
+  <div>
+    <h1 class="px-page-title">Dashboard</h1>
+    <p class="px-page-subtitle">Welcome back, {{ auth.user()?.name }}.</p>
+  </div>
+
+  <div class="px-panel-grid">
+    <article class="px-panel">
+      <h2 class="px-panel__title"><i class="fa-solid fa-user"></i> Account</h2>
+      <div class="px-panel__body">
+        <p>Course: {{ auth.user()?.course }}</p>
+        <p>Year Level: {{ auth.user()?.year_level }}</p>
+      </div>
+      <a class="px-panel__link" routerLink="/profile"><i class="fa-solid fa-arrow-right"></i> Manage profile</a>
+    </article>
+
+    <article class="px-panel">
+      <h2 class="px-panel__title"><i class="fa-solid fa-scroll"></i> Next Quest</h2>
+      <div class="px-panel__body">
+        <p>Complete your study-habit assessment to unlock personalized recommendations.</p>
+      </div>
+      <a class="px-panel__link" routerLink="/habits/assessment"><i class="fa-solid fa-arrow-right"></i> Start assessment</a>
+      <a class="px-panel__link" routerLink="/habits/results"><i class="fa-solid fa-arrow-right"></i> View results</a>
+    </article>
+
+    <article class="px-panel">
+      <h2 class="px-panel__title"><i class="fa-solid fa-chart-line"></i> Career Goal</h2>
+      <div class="px-panel__body">
+        <p>
+          Selected Career:
+          {{ auth.user()?.career?.name || 'Not set' }}
+        </p>
+      </div>
+      <a class="px-panel__link" routerLink="/onboarding/career"><i class="fa-solid fa-arrow-right"></i> Edit career goal</a>
+    </article>
+  </div>
+
+  <article class="px-panel career-panel">
+    <h2 class="px-panel__title"><i class="fa-solid fa-bullseye"></i> Improve Skills for {{ selectedCareerName() || 'Your Career' }}</h2>
+
+    @if (!auth.user()?.career_id) {
+      <p class="px-page-subtitle">Choose a target career to unlock aligned subject recommendations.</p>
+      <a class="px-panel__link" routerLink="/onboarding/career"><i class="fa-solid fa-arrow-right"></i> Choose career now</a>
+    } @else if (recommendationsLoading()) {
+      <p class="px-page-subtitle">Loading career-aligned recommendations...</p>
+    } @else {
+      @if (recommendationsError()) {
+        <p class="px-msg px-msg--error">{{ recommendationsError() }}</p>
+      }
+
+      @if (careerRecommendations().length === 0) {
+        <p class="px-page-subtitle">
+          No subject recommendations yet. Submit a habits assessment first.
+        </p>
+      } @else {
+        <ul class="career-reco-list">
+          @for (item of careerRecommendations(); track item.subject_id) {
+            <li class="career-reco-item">
+              <div class="career-reco-item__head">
+                <h3>{{ item.subject_name }}</h3>
+                <span class="career-reco-item__weakness">{{ weaknessPercent(item.weakness_score) }}% weak</span>
+              </div>
+
+              <p>{{ item.career_relevance_context }}</p>
+              <p>Supporting skills: {{ item.supporting_skills.join(', ') }}</p>
+
+              <div class="career-reco-links">
+                @for (resource of item.resources; track resource.id) {
+                  <a [href]="resource.url" target="_blank" rel="noopener noreferrer">
+                    {{ resource.provider }} · {{ resource.title }}
+                  </a>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    }
+  </article>
+</section>

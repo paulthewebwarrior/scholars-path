@@ -1,0 +1,62 @@
+<div class="auth-page">
+  <h1 class="auth-page__title">Hackathon</h1>
+  <p class="auth-page__subtitle">Create Your Player Profile</p>
+
+  <div class="auth-card register-card">
+    <span class="auth-card__icon" aria-hidden="true"><i class="fa-solid fa-user-plus"></i></span>
+
+    <form class="auth-form" [formGroup]="registerForm" (ngSubmit)="submit()">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        placeholder="your@email.com"
+      />
+      @if (registerForm.controls.email.dirty && registerForm.controls.email.errors?.['email']) {
+        <p class="auth-hint auth-error">Invalid email format</p>
+      }
+
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        autocomplete="new-password"
+        placeholder="············"
+      />
+      <p class="auth-hint">Strength: {{ passwordStrength().label }}</p>
+      <ul class="auth-checklist">
+        <li [class.pass]="passwordStrength().checks.length">At least 8 characters</li>
+        <li [class.pass]="passwordStrength().checks.uppercase">One uppercase letter</li>
+        <li [class.pass]="passwordStrength().checks.lowercase">One lowercase letter</li>
+        <li [class.pass]="passwordStrength().checks.number">One number</li>
+      </ul>
+
+      <label for="name">Full Name</label>
+      <input id="name" type="text" formControlName="name" autocomplete="name" placeholder="Your full name" />
+
+      <label for="course">Course</label>
+      <input id="course" type="text" formControlName="course" placeholder="e.g. Computer Science" />
+
+      <label for="year-level">Year Level</label>
+      <select id="year-level" formControlName="year_level">
+        @for (year of yearLevels; track year) {
+          <option [value]="year">{{ year }}</option>
+        }
+      </select>
+
+      @if (serverError()) {
+        <p class="auth-error">{{ serverError() }}</p>
+      }
+
+      <button class="auth-btn" type="submit" [disabled]="registerForm.invalid || loading()">
+        @if (!loading()) { <i class="fa-solid fa-shield-halved"></i> } @else { <i class="fa-solid fa-spinner fa-spin"></i> }
+        {{ loading() ? 'Loading...' : 'Join Quest' }}
+      </button>
+    </form>
+
+    <p class="auth-meta">Already have an account?&nbsp;<a routerLink="/login">Sign In</a>.</p>
+  </div>
+</div>

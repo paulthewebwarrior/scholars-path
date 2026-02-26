@@ -1,0 +1,131 @@
+<section class="px-page assessment-page" [class.leaving]="leaving()">
+  <!-- ── Level Header ── -->
+  <header class="level-header">
+    <div class="level-title-row">
+      <span class="level-badge">
+        <i class="fa-solid fa-gamepad"></i>
+        Level {{ currentStep() }}
+      </span>
+      <h1 class="level-title">{{ STEP_LABELS[currentStep()] }}</h1>
+    </div>
+    <p class="level-subtitle">{{ STEP_SUBTITLES[currentStep()] }}</p>
+    <div class="level-meta">
+      <div class="step-dots">
+        @for (dot of stepDots; track dot) {
+          <div class="step-dot"
+               [class.step-dot--done]="dot + 1 < currentStep()"
+               [class.step-dot--active]="dot + 1 === currentStep()"
+               [attr.aria-label]="'Level ' + (dot + 1)"></div>
+        }
+      </div>
+      <div class="draft-badge" [class.draft-badge--clean]="!hasUnsavedChanges()">
+        <i class="fa-solid fa-floppy-disk"></i>
+        <span>{{ draftStatus() }}</span>
+      </div>
+    </div>
+  </header>
+  <!-- ── Feedback ── -->
+  @if (successMessage()) {
+    <p class="px-msg px-msg--success"><i class="fa-solid fa-circle-check"></i> {{ successMessage() }}</p>
+  }
+  @if (errorMessage()) {
+    <p class="px-msg px-msg--error"><i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage() }}</p>
+  }
+  <!-- ── Form ── -->
+  <form class="habits-form" [formGroup]="habitsForm" (ngSubmit)="submit()" aria-label="Habits Assessment Form">
+    @for (q of STEP_QUESTIONS[currentStep()]; track q.field) {
+      <!-- Likert scale question -->
+      @if (q.type === 'scale') {
+        <article class="question-card px-panel">
+          <p class="question-text">{{ q.text }}</p>
+          <div class="scale-container">
+            <div class="scale-row">
+              @for (n of SCALE_NUMS; track n) {
+                <button
+                  type="button"
+                  class="scale-box"
+                  [class.scale-box--selected]="getRating(q.field) === n"
+                  (click)="selectRating(q.field, n)"
+                  [attr.aria-label]="'Rate ' + n + ' of 5'"
+                  [attr.aria-pressed]="getRating(q.field) === n">
+                  <span class="sr-only">{{ n }}</span>
+                </button>
+              }
+            </div>
+            <div class="scale-axis">
+              <span class="axis-label">Disagree</span>
+              <div class="scale-nums">
+                @for (n of SCALE_NUMS; track n) {
+                  <span>{{ n }}</span>
+                }
+              </div>
+              <span class="axis-label">Agree</span>
+            </div>
+          </div>
+          @if (fieldError(q.field)) {
+            <small class="field-error"><i class="fa-solid fa-triangle-exclamation"></i> {{ fieldError(q.field) }}</small>
+          }
+        </article>
+      }
+      <!-- Numeric input question -->
+      @if (q.type === 'number') {
+        <article class="question-card px-panel">
+          <label class="question-text" [for]="q.field">
+            {{ q.text }}
+            @if (q.optional) { <span class="optional-badge">optional</span> }
+          </label>
+          <div class="num-row">
+            <input [id]="q.field" type="number" [formControlName]="q.field"
+                   [min]="q.min" [max]="q.max" [step]="q.step"
+                   class="px-input" placeholder="—" />
+            <span class="input-unit">{{ q.unit }}</span>
+          </div>
+          @if (fieldError(q.field)) {
+            <small class="field-error"><i class="fa-solid fa-triangle-exclamation"></i> {{ fieldError(q.field) }}</small>
+          }
+        </article>
+      }
+      <!-- Checkbox question -->
+      @if (q.type === 'checkbox') {
+        <article class="question-card px-panel question-card--checkbox">
+          <label class="optin-label">
+            <input type="checkbox" [formControlName]="q.field" class="px-checkbox" />
+            <span>{{ q.text }}</span>
+          </label>
+        </article>
+      }
+    }
+    <!-- ── Actions ── -->
+    <div class="actions">
+      @if (currentStep() > 1) {
+        <button type="button" class="px-btn px-btn--ghost" (click)="prevStep()">
+          <i class="fa-solid fa-arrow-left"></i> BACK
+        </button>
+      }
+      <div class="actions-right">
+        <button type="button" class="px-btn save-draft-btn" (click)="saveDraft()" title="Save draft">
+          <i class="fa-solid fa-floppy-disk"></i>
+        </button>
+        @if (currentStep() < TOTAL_STEPS) {
+          <button type="button" class="px-btn px-btn--next" (click)="nextStep()">
+            NEXT LEVEL <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        }
+        @if (currentStep() === TOTAL_STEPS) {
+          @if (errorMessage()) {
+            <button type="button" class="px-btn retry-btn" (click)="retryLastSubmission()" [disabled]="submitting()">
+              <i class="fa-solid fa-rotate-right"></i> RETRY
+            </button>
+          }
+          <button type="submit" class="px-btn submit-btn" [disabled]="habitsForm.invalid || submitting()">
+            @if (submitting()) {
+              <i class="fa-solid fa-spinner fa-spin"></i> SUBMITTING...
+            } @else {
+              <i class="fa-solid fa-paper-plane"></i> SUBMIT
+            }
+          </button>
+        }
+      </div>
+    </div>
+  </form>
+</section>

@@ -1,0 +1,280 @@
+<section class="px-page results-page" [class.leaving]="leaving()">
+
+  <!-- ── Header ── -->
+  <header class="results-header">
+    <div>
+      <h1 class="px-page-title">
+        <i class="fa-solid fa-chart-line"></i>
+        Habits Results
+      </h1>
+      <p class="px-page-subtitle">
+        Your latest metrics, correlation insights, and personalized mission briefings.
+      </p>
+    </div>
+    <div class="results-badge" [class.results-badge--loading]="loading()">
+      <i class="fa-solid fa-satellite-dish"></i>
+      <span>{{ loading() ? 'Loading data…' : latestAssessment() ? 'Mission data loaded' : 'No data yet' }}</span>
+    </div>
+  </header>
+
+  <!-- ── Loading skeleton ── -->
+  @if (loading()) {
+    <div class="skeleton-grid">
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <div class="skeleton-card"></div>
+      }
+    </div>
+    <div class="px-panel skeleton-panel"><div class="skeleton-line"></div><div class="skeleton-line sk-short"></div></div>
+    <div class="px-panel skeleton-panel"><div class="skeleton-line"></div><div class="skeleton-line sk-short"></div></div>
+  }
+
+  <!-- ── Error ── -->
+  @if (errorMessage()) {
+    <p class="px-msg px-msg--error"><i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage() }}</p>
+  }
+
+  @if (!loading() && latestAssessment()) {
+
+    <article class="px-panel results-panel results-delay-1">
+      <h2 class="px-panel__title"><i class="fa-solid fa-gauge-high"></i> Productivity Score</h2>
+      @if (productivityScore() !== null) {
+        <div class="metric-card"
+             [class.metric-card--good]="productivityTierClass() === 'good'"
+             [class.metric-card--warn]="productivityTierClass() === 'warn'"
+             [class.metric-card--bad]="productivityTierClass() === 'bad'">
+          <div class="metric-card__icon"><i class="fa-solid fa-bolt"></i></div>
+          <div class="metric-card__body">
+            <p class="metric-card__label">Predicted Productivity</p>
+            <p class="metric-card__value">{{ productivityScore()!.toFixed(2) }}<span class="metric-card__unit"> / 100</span></p>
+          </div>
+          <div class="metric-card__status-dot"></div>
+        </div>
+      } @else {
+        <p class="empty-state">Productivity model is unavailable right now.</p>
+      }
+    </article>
+
+    <!-- ── Stat metrics grid ── -->
+    <section class="results-section">
+      <h2 class="section-heading"><i class="fa-solid fa-list-check"></i> Submitted Metrics</h2>
+      <div class="metrics-grid">
+        @for (m of metricConfig; track m.key; let idx = $index) {
+          <div class="metric-card"
+               [class.metric-card--good]="metricClass(m.key, $any(latestAssessment())?.[m.key]) === 'good'"
+               [class.metric-card--warn]="metricClass(m.key, $any(latestAssessment())?.[m.key]) === 'warn'"
+               [class.metric-card--bad]="metricClass(m.key, $any(latestAssessment())?.[m.key]) === 'bad'"
+               [style.animation-delay]="idx * 55 + 40 + 'ms'">
+            <div class="metric-card__icon"><i class="fa-solid {{ m.icon }}"></i></div>
+            <div class="metric-card__body">
+              <p class="metric-card__label">{{ m.label }}</p>
+              <p class="metric-card__value">
+                {{ $any(latestAssessment())?.[m.key] ?? '—' }}
+                <span class="metric-card__unit">{{ m.unit }}</span>
+              </p>
+            </div>
+            <div class="metric-card__status-dot"></div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- ── Correlations ── -->
+    <article class="px-panel results-panel results-delay-1">
+      <h2 class="px-panel__title"><i class="fa-solid fa-wave-square"></i> Top Correlations</h2>
+      <p class="corr-note" title="Correlation does not imply causation.">
+        <i class="fa-solid fa-circle-info"></i>
+        Statistical relationships only — correlation ≠ causation.
+      </p>
+
+      @if (topCorrelations().length === 0) {
+        <p class="empty-state">No correlation data available yet.</p>
+      } @else {
+        <ul class="corr-list">
+          @for (c of topCorrelations(); track c.id; let idx = $index) {
+            <li class="corr-item" [style.animation-delay]="idx * 80 + 30 + 'ms'">
+              <div class="corr-item__header">
+                <span class="corr-item__name">{{ formatMetricName(c.metric_name) }}</span>
+                <span class="corr-item__coeff corr-item__coeff--{{ correlationSign(c.correlation_coefficient) }}">
+                  r = {{ c.correlation_coefficient.toFixed(3) }}
+                </span>
+              </div>
+              <div class="corr-bar-track">
+                <div class="corr-bar"
+                     [class.corr-bar--pos]="correlationSign(c.correlation_coefficient) === 'pos'"
+                     [class.corr-bar--neg]="correlationSign(c.correlation_coefficient) === 'neg'"
+                     [style.width]="correlationBarWidth(c.correlation_coefficient)"
+                     [style.animation-delay]="idx * 80 + 200 + 'ms'">
+                </div>
+              </div>
+              <div class="corr-item__ci">
+                CI [{{ c.confidence_interval_low.toFixed(3) }}, {{ c.confidence_interval_high.toFixed(3) }}]
+                &nbsp;·&nbsp; p = {{ c.p_value.toFixed(4) }}
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </article>
+
+    <!-- ── Recommendations ── -->
+    <article class="px-panel results-panel results-delay-2">
+      <h2 class="px-panel__title"><i class="fa-solid fa-scroll"></i> Mission Briefings</h2>
+
+      @if (recommendations().length === 0) {
+        <p class="empty-state">No recommendations generated yet.</p>
+      } @else {
+        <ul class="quest-list">
+          @for (r of recommendations(); track r.id; let idx = $index) {
+            <li class="quest-card" [style.animation-delay]="idx * 90 + 50 + 'ms'">
+              <div class="quest-card__header">
+                <span class="quest-rank">#{{ r.priority_rank }}</span>
+                <p class="quest-card__text">{{ r.recommendation_text }}</p>
+              </div>
+              <div class="quest-card__meta">
+                <span><i class="fa-solid fa-chart-bar"></i> {{ formatMetricName(r.supporting_metric) }}</span>
+                <span><i class="fa-solid fa-signal"></i> strength {{ r.correlation_strength.toFixed(2) }}</span>
+                <span class="quest-status quest-status--{{ r.status }}">{{ r.status }}</span>
+              </div>
+
+              <button type="button" class="px-btn why-btn" (click)="toggleWhy(r.id)">
+                <i class="fa-solid fa-{{ isWhyExpanded(r.id) ? 'chevron-up' : 'chevron-down' }}"></i>
+                {{ isWhyExpanded(r.id) ? 'Hide reasoning' : 'Why this?' }}
+              </button>
+
+              @if (isWhyExpanded(r.id)) {
+                <p class="why-text">
+                  Based on cohort-level correlation analysis and your latest values, this recommendation
+                  targets your highest-impact habit. The supporting metric
+                  <strong>{{ formatMetricName(r.supporting_metric) }}</strong>
+                  shows a correlation strength of {{ r.correlation_strength.toFixed(2) }} with academic performance.
+                </p>
+              }
+
+              <div class="feedback-row">
+                <button type="button" class="px-btn feedback-btn feedback-btn--attempted"
+                        [class.active]="r.status === 'attempted'"
+                        (click)="sendFeedback(r.id, 'attempted')">
+                  <i class="fa-solid fa-hourglass-half"></i> Attempted
+                </button>
+                <button type="button" class="px-btn feedback-btn feedback-btn--completed"
+                        [class.active]="r.status === 'completed'"
+                        (click)="sendFeedback(r.id, 'completed')">
+                  <i class="fa-solid fa-circle-check"></i> Completed
+                </button>
+                <button type="button" class="px-btn feedback-btn feedback-btn--na"
+                        [class.active]="r.status === 'not_applicable'"
+                        (click)="sendFeedback(r.id, 'not_applicable')">
+                  <i class="fa-solid fa-ban"></i> N/A
+                </button>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </article>
+
+    <!-- ── Career-Aligned Recommendations ── -->
+    <article class="px-panel results-panel results-delay-2">
+      <h2 class="px-panel__title"><i class="fa-solid fa-compass"></i> Improve Skills for {{ selectedCareerName() || 'Your Career' }}</h2>
+
+      @if (careerRecommendationsError()) {
+        <p class="px-msg px-msg--error">{{ careerRecommendationsError() }}</p>
+      }
+
+      @if (careerRecommendationsLoading()) {
+        <p class="empty-state">Refreshing career-aligned recommendations...</p>
+      } @else if (careerRecommendations().length === 0) {
+        <p class="empty-state">No career-aligned recommendations yet. Set a career goal and submit an assessment.</p>
+      } @else {
+        <ul class="career-list">
+          @for (item of careerRecommendations(); track item.subject_id) {
+            <li class="career-item">
+              <div class="career-item__head">
+                <h3>{{ item.subject_name }}</h3>
+                <span class="career-item__weakness">{{ weaknessPercent(item.weakness_score) }}% weak</span>
+              </div>
+              <p class="career-item__context">{{ item.career_relevance_context }}</p>
+              <p class="career-item__skills">Skills: {{ item.supporting_skills.join(', ') }}</p>
+              <div class="career-item__resources">
+                @for (resource of item.resources; track resource.id) {
+                  <a [href]="resource.url" target="_blank" rel="noopener noreferrer">
+                    {{ resource.provider }} · {{ resource.title }}
+                  </a>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </article>
+
+    <!-- ── Simulation Panel ── -->
+    <article class="px-panel results-panel results-delay-3">
+      <h2 class="px-panel__title"><i class="fa-solid fa-sliders"></i> Simulation Mode</h2>
+      <p class="px-page-subtitle">Adjust habits and see career alignment update in real time.</p>
+
+      <form [formGroup]="simulationForm" class="simulation-form">
+        <label for="sim-study">Study hours/day: {{ simulationForm.controls.study_hours.value }}</label>
+        <input id="sim-study" type="range" min="0" max="12" step="0.5" formControlName="study_hours" />
+
+        <label for="sim-focus">Focus score: {{ simulationForm.controls.focus_score.value }}</label>
+        <input id="sim-focus" type="range" min="0" max="100" step="1" formControlName="focus_score" />
+
+        <label for="sim-phone">Phone usage/day: {{ simulationForm.controls.phone_usage_hours.value }}</label>
+        <input id="sim-phone" type="range" min="0" max="12" step="0.5" formControlName="phone_usage_hours" />
+
+        <label for="sim-social">Social media/day: {{ simulationForm.controls.social_media_hours.value }}</label>
+        <input id="sim-social" type="range" min="0" max="10" step="0.5" formControlName="social_media_hours" />
+
+        <label for="sim-sleep">Sleep hours/day: {{ simulationForm.controls.sleep_hours.value }}</label>
+        <input id="sim-sleep" type="range" min="0" max="12" step="0.5" formControlName="sleep_hours" />
+
+        <label for="sim-assignments">Assignments/week: {{ simulationForm.controls.assignments_completed_per_week.value }}</label>
+        <input id="sim-assignments" type="range" min="0" max="20" step="1" formControlName="assignments_completed_per_week" />
+      </form>
+
+      @if (simulationImpactMessage()) {
+        <p class="sim-impact">{{ simulationImpactMessage() }}</p>
+      }
+
+      <div class="actions">
+        <button type="button" class="px-btn px-btn--secondary" (click)="resetSimulation()">
+          <i class="fa-solid fa-rotate-left"></i> Reset Simulation
+        </button>
+      </div>
+    </article>
+
+    <!-- ── Previous vs Current ── -->
+    @if (previousAssessment()) {
+      <article class="px-panel results-panel results-delay-3">
+        <h2 class="px-panel__title"><i class="fa-solid fa-clock-rotate-left"></i> Progress Snapshot</h2>
+        <p class="px-page-subtitle">Comparing your latest assessment to your previous one.</p>
+        <div class="delta-grid">
+          @for (m of metricConfig; track m.key) {
+            @if (metricDelta(m.key) !== null) {
+              <div class="delta-card">
+                <span class="delta-card__label">
+                  <i class="fa-solid {{ m.icon }}"></i> {{ m.label }}
+                </span>
+                <span class="delta-card__arrow delta-arrow--{{ metricDeltaClass(m.key) }}">
+                  @if (metricDeltaClass(m.key) === 'up') { ↑ }
+                  @else if (metricDeltaClass(m.key) === 'down') { ↓ }
+                  @else { — }
+                </span>
+                <span class="delta-card__value">{{ metricDelta(m.key) }} {{ m.unit }}</span>
+              </div>
+            }
+          }
+        </div>
+      </article>
+    }
+
+    <!-- ── Bottom Actions ── -->
+    <div class="actions">
+      <button type="button" class="px-btn retake-btn" (click)="retakeAssessment()">
+        <i class="fa-solid fa-rotate-left"></i> Retake Assessment
+      </button>
+    </div>
+
+  }
+</section>

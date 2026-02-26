@@ -1,0 +1,48 @@
+<section class="px-page">
+  <header class="career-header">
+    <div>
+      <h1 class="px-page-title"><i class="fa-solid fa-compass"></i> Choose Your Target Career</h1>
+      <p class="px-page-subtitle">Your recommendations will prioritize subjects aligned with this goal.</p>
+    </div>
+    <a class="px-btn px-btn--secondary" routerLink="/dashboard"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+  </header>
+
+  @if (loading()) {
+    <p class="px-page-subtitle">Loading career options...</p>
+  } @else {
+    @if (successMessage()) {
+      <p class="px-msg px-msg--success">{{ successMessage() }}</p>
+    }
+    @if (errorMessage()) {
+      <p class="px-msg px-msg--error">{{ errorMessage() }}</p>
+    }
+
+    <form [formGroup]="selectionForm" (ngSubmit)="saveSelection()" class="career-form">
+      <div class="career-grid">
+        @for (career of careers(); track career.id) {
+          <label class="career-card" [class.career-card--active]="selectionForm.controls.career_id.value === career.id">
+            <input
+              type="radio"
+              formControlName="career_id"
+              [value]="career.id"
+              (change)="chooseCareer(career.id)"
+            />
+            <span class="career-card__title">{{ career.name }}</span>
+            <span class="career-card__desc">{{ career.description }}</span>
+          </label>
+        }
+      </div>
+
+      @if (selectionForm.controls.career_id.invalid && selectionForm.controls.career_id.touched) {
+        <p class="px-msg px-msg--error">Please select a career before continuing.</p>
+      }
+
+      <div class="career-actions">
+        <button type="submit" class="px-btn" [disabled]="saving()">
+          @if (!saving()) { <i class="fa-solid fa-floppy-disk"></i> } @else { <i class="fa-solid fa-spinner fa-spin"></i> }
+          {{ saving() ? 'Saving...' : 'Save Career Goal' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>
